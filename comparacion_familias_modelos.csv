@@ -1,0 +1,23 @@
+﻿familia;modelo;AUC;IC95;Brier;objetivo
+Machine learning;Gradient boosting (sklearn);0,6854373679915514;0.655-0.715;0,21239194988025561;uci_prolongada
+Machine learning;Random forest;0,6818206365207373;0.651-0.712;0,21211969445378043;uci_prolongada
+Machine learning;XGBoost;0,6812851022465438;0.652-0.711;0,2148322547993156;uci_prolongada
+Clásico;Logística + splines;0,6811125912058372;0.650-0.711;0,21253401835988275;uci_prolongada
+Machine learning;LightGBM;0,6805620559715821;0.649-0.710;0,21569476610952318;uci_prolongada
+Clásico;Logística clásica;0,6743441580261136;0.643-0.704;0,21483849510814274;uci_prolongada
+Clásico;Árbol de decisión;0,6482844902073733;0.615-0.682;0,21946947349786966;uci_prolongada
+Machine learning;Red neuronal (MLP);0,6452902985791091;0.614-0.676;0,22217094872931242;uci_prolongada
+Supervivencia;Cox (P de seguir en UCI al día 7);0,6411095310099846;0.606-0.673;0,2193924034626438;uci_prolongada
+Multiestado;Markov tiempo continuo + covariables;0,637425295218894;0.603-0.670;0,22025531627670153;uci_prolongada
+Clásico;Árbol interpretable (profundidad 3);0,5804531490015361;0.552-0.609;0,37414494361249767;uci_prolongada
+Machine learning;Random forest;0,7399465057692907;0.707-0.772;0,16966171753229056;egreso_directo_uci
+Machine learning;XGBoost;0,7357046344388116;0.701-0.768;0,16774176315449588;egreso_directo_uci
+Machine learning;Gradient boosting (sklearn);0,7339111263161895;0.701-0.766;0,16803651203959177;egreso_directo_uci
+Clásico;Logística + splines;0,7338990313673858;0.703-0.767;0,1700629388917691;egreso_directo_uci
+Clásico;Logística clásica;0,7296969005829765;0.697-0.763;0,1710426576367874;egreso_directo_uci
+Machine learning;LightGBM;0,726237745225087;0.693-0.759;0,1692600212706622;egreso_directo_uci
+Machine learning;Red neuronal (MLP);0,725415288706428;0.690-0.761;0,17271287042379957;egreso_directo_uci
+Multiestado;Markov tiempo continuo + covariables;0,7094655069338613;0.678-0.742;0,1768658815661378;egreso_directo_uci
+Clásico;Árbol de decisión;0,6927278256392182;0.659-0.727;0,17708392718471067;egreso_directo_uci
+Clásico;Árbol interpretable (profundidad 3);0,5901540205337672;0.563-0.624;0,3164633019042337;egreso_directo_uci
+Multiestado;Markov sin covariables (solo procedencia);0,5408152686633699;0.515-0.569;0,20300192494681848;egreso_directo_uci

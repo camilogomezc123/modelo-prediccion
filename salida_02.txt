@@ -1,0 +1,227 @@
+C:\xampp\htdocs\Modelo de prediccion\02_seleccion_variables.py:68: Pandas4Warning: Series.dt.dayofweek is deprecated and will be removed in a future version. Use Series.dt.day_of_week instead.
+  df["dia_semana_ingreso"] = df["fecha_ingreso_min"].dt.dayofweek
+C:\Users\kevin\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\linear_model\_logistic.py:1381: FutureWarning: 'penalty' was deprecated in version 1.8 and will be removed in 1.10. To avoid this warning, leave 'penalty' set to its default value and use 'l1_ratio' or 'C' instead. Use l1_ratio=0 instead of penalty='l2', l1_ratio=1 instead of penalty='l1', l1_ratio set to a float between 0 and 1 instead of penalty='elasticnet', and C=np.inf instead of penalty=None.
+  warnings.warn(
+C:\Users\kevin\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\linear_model\_logistic.py:1407: UserWarning: Inconsistent values: penalty=l1 with l1_ratio=0.0. penalty is deprecated. Please use l1_ratio only.
+  warnings.warn(
+Cohorte 2024-10-01 a 2026-08-31: 6724 ingresos, 6210 pacientes
+
+==========================================================================================
+OBJETIVO: uci_prolongada  (prevalencia 24.6%)
+==========================================================================================
+
+-- Univariado (más fuertes; AUC < 0.5 = protector) --
+          grupo                variable        metrica  efecto  p_valor  completitud  fuerza
+   dx_principal             capitulo_dx    V de Cramér  0.2068   0.0000       0.9994  0.2068
+    aseguradora             aseguradora    V de Cramér  0.1649   0.0000       1.0000  0.1649
+   news_inicial            news_inicial AUC univariado  0.6624   0.0000       0.5272  0.1624
+   sofa_inicial puntuacion_sofa_inicial AUC univariado  0.6501   0.0000       0.7350  0.1501
+ dx_secundarios          n_diagnosticos AUC univariado  0.6074   0.0000       1.0000  0.1074
+ dx_secundarios        dxa_desnutricion AUC univariado  0.5875   0.0000       1.0000  0.0875
+barthel_inicial         barthel_inicial AUC univariado  0.4367   0.0000       0.8998  0.0633
+   dx_principal        dxp_desnutricion AUC univariado  0.5593   0.0000       1.0000  0.0593
+ signos_vitales                      fc AUC univariado  0.5511   0.0000       0.9960  0.0511
+ signos_vitales            ta_sistolica AUC univariado  0.4498   0.0000       0.9612  0.0502
+ signos_vitales                     tam AUC univariado  0.4571   0.0000       0.9612  0.0429
+ signos_vitales           ta_diastolica AUC univariado  0.4595   0.0000       0.9863  0.0405
+ dx_secundarios              dxa_sepsis AUC univariado  0.5360   0.0000       1.0000  0.0360
+ dx_secundarios  dxa_falla_respiratoria AUC univariado  0.5356   0.0000       1.0000  0.0356
+ dx_secundarios            dxa_neumonia AUC univariado  0.5346   0.0000       1.0000  0.0346
+     calendario      dia_semana_ingreso AUC univariado  0.5336   0.0000       1.0000  0.0336
+   dx_principal            dxp_arritmia AUC univariado  0.4728   0.0000       1.0000  0.0272
+     calendario           fin_de_semana AUC univariado  0.5244   0.0001       1.0000  0.0244
+ dx_secundarios            dxa_arritmia AUC univariado  0.4756   0.0000       1.0000  0.0244
+ signos_vitales               temp_piel AUC univariado  0.5234   0.0041       0.9981  0.0234
+ dx_secundarios              dxa_cancer AUC univariado  0.5204   0.0000       1.0000  0.0204
+           sexo                  sexo_m AUC univariado  0.5198   0.0061       0.9274  0.0198
+
+Modelo completo: AUC CV por paciente = 0.756 (folds 0.747-0.764) | AUC temporal = 0.764
+
+-- Aporte de cada grupo (pérdida de AUC al quitarlo) --
+           grupo  perdida_auc_al_quitar  folds_que_empeoran  auc_solo_grupo  perdida_auc_temporal
+    sofa_inicial                 0.0199                   5          0.6753                0.0106
+  dx_secundarios                 0.0110                   5          0.6784                0.0008
+  signos_vitales                 0.0108                   5          0.5546                0.0006
+    news_inicial                 0.0095                   5          0.6200                0.0096
+     aseguradora                 0.0059                   3          0.5907                0.0060
+ barthel_inicial                 0.0036                   5          0.5869                0.0028
+procedencia_piso                 0.0027                   4          0.4956               -0.0001
+      calendario                 0.0022                   3          0.5123                0.0002
+            peso                 0.0016                   3          0.5432               -0.0018
+    dx_principal                 0.0007                   3          0.6480                0.0018
+            edad                 0.0001                   3          0.5535               -0.0001
+            sexo                -0.0007                   2          0.5423                0.0015
+
+-- Permutación por variable (top 20) --
+                          media  folds_positivos
+puntuacion_sofa_inicial  0.0565                5
+news_inicial             0.0315                5
+aseguradora              0.0178                5
+capitulo_dx              0.0111                5
+n_diagnosticos           0.0105                5
+dxa_desnutricion         0.0099                5
+ta_diastolica            0.0034                4
+tam                      0.0034                4
+barthel_inicial          0.0033                4
+peso                     0.0033                4
+dxa_falla_respiratoria   0.0032                5
+mes_ingreso              0.0027                3
+dxp_arritmia             0.0027                5
+dxa_neumonia             0.0024                4
+fc                       0.0021                4
+ta_sistolica             0.0020                3
+temp_piel                0.0018                4
+procedencia_piso         0.0016                5
+dxa_acv                  0.0015                4
+edad                     0.0014                4
+
+-- Logística L1 (casos completos SOFA+Barthel, coeficientes estandarizados) --
+puntuacion_sofa_inicial                               0.329
+n_diagnosticos                                        0.211
+aseguradora_SALUD TOTAL EPS S SA                      0.167
+dxa_falla_respiratoria                                0.151
+dxp_obstetrico                                       -0.134
+dxa_desnutricion                                      0.131
+aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA       0.115
+temp_piel                                             0.108
+dxa_neumonia                                          0.107
+dxa_arritmia                                         -0.105
+dxa_acv                                               0.103
+dxp_desnutricion                                      0.097
+dxp_hta                                              -0.093
+aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS    0.077
+dia_semana_ingreso                                    0.072
+dxa_trauma                                            0.067
+ta_sistolica                                         -0.055
+capitulo_dx_C                                         0.054
+capitulo_dx_O                                        -0.050
+dxa_sepsis                                            0.049
+dxa_cancer                                           -0.042
+procedencia_piso                                     -0.041
+dxa_diabetes                                         -0.041
+dxp_cancer                                            0.039
+aseguradora_COOSALUD ENTIDAD PROMOTORA DE SALUD SA    0.036
+
+Sensibilidad: AUC en casos CON SOFA = 0.733 | SIN SOFA = 0.734 | prevalencia con/sin SOFA = 0.29/0.12
+Sensibilidad: sin diagnósticos secundarios AUC = 0.745 (vs 0.756)
+
+-- Conjuntos candidatos (AUC CV por paciente | AUC temporal) --
+  todas (incluye variables con fuga)       0.756 (folds 0.747-0.764) | 0.764
+  BASE recomendada                         0.721 (folds 0.700-0.735) | 0.747
+  BASE + news_inicial                      0.732 (folds 0.721-0.741) | 0.754
+  BASE + dx_secundarios (fuga parcial)     0.739 (folds 0.727-0.753) | 0.750
+  BASE + signos_vitales (fuga)             0.731 (folds 0.718-0.738) | 0.739
+  BASE sin aseguradora                     0.713 (folds 0.696-0.738) | 0.736
+  BASE sin sofa                            0.675 (folds 0.652-0.698) | 0.698
+
+==========================================================================================
+OBJETIVO: egreso_directo_uci  (prevalencia 29.4%)
+==========================================================================================
+
+-- Univariado (más fuertes; AUC < 0.5 = protector) --
+           grupo                          variable        metrica  efecto  p_valor  completitud  fuerza
+    dx_principal                       capitulo_dx    V de Cramér  0.2754   0.0000       0.9994  0.2754
+     aseguradora                       aseguradora    V de Cramér  0.2460   0.0000       1.0000  0.2460
+  dx_secundarios                    n_diagnosticos AUC univariado  0.3382   0.0000       1.0000  0.1618
+  signos_vitales                     ta_diastolica AUC univariado  0.3751   0.0000       0.9863  0.1249
+  signos_vitales                                fc AUC univariado  0.4077   0.0000       0.9960  0.0923
+  dx_secundarios                  dxa_desnutricion AUC univariado  0.4157   0.0000       1.0000  0.0843
+  signos_vitales                               tam AUC univariado  0.4212   0.0000       0.9612  0.0788
+  dx_secundarios                           dxa_hta AUC univariado  0.4333   0.0000       1.0000  0.0667
+    dx_principal                  dxp_desnutricion AUC univariado  0.4416   0.0000       1.0000  0.0584
+    dx_principal                      dxp_arritmia AUC univariado  0.5570   0.0000       1.0000  0.0570
+procedencia_piso                  procedencia_piso AUC univariado  0.4452   0.0000       1.0000  0.0548
+  signos_vitales                      ta_sistolica AUC univariado  0.4453   0.0000       0.9612  0.0547
+      calendario                dia_semana_ingreso AUC univariado  0.4458   0.0000       1.0000  0.0542
+  dx_secundarios                      dxa_arritmia AUC univariado  0.5534   0.0000       1.0000  0.0534
+      calendario                     fin_de_semana AUC univariado  0.4584   0.0000       1.0000  0.0416
+  dx_secundarios                        dxa_cancer AUC univariado  0.4635   0.0000       1.0000  0.0365
+ barthel_inicial                   barthel_inicial AUC univariado  0.5309   0.0000       0.8998  0.0309
+  dx_secundarios                      dxa_diabetes AUC univariado  0.4708   0.0000       1.0000  0.0292
+    dx_principal dxp_cardiopatia_isquemica_cronica AUC univariado  0.5282   0.0000       1.0000  0.0282
+  dx_secundarios dxa_cardiopatia_isquemica_cronica AUC univariado  0.5233   0.0000       1.0000  0.0233
+    news_inicial                      news_inicial AUC univariado  0.4769   0.0312       0.5272  0.0231
+    sofa_inicial           puntuacion_sofa_inicial AUC univariado  0.5204   0.0269       0.7350  0.0204C:\Users\kevin\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\linear_model\_logistic.py:1381: FutureWarning: 'penalty' was deprecated in version 1.8 and will be removed in 1.10. To avoid this warning, leave 'penalty' set to its default value and use 'l1_ratio' or 'C' instead. Use l1_ratio=0 instead of penalty='l2', l1_ratio=1 instead of penalty='l1', l1_ratio set to a float between 0 and 1 instead of penalty='elasticnet', and C=np.inf instead of penalty=None.
+  warnings.warn(
+C:\Users\kevin\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\linear_model\_logistic.py:1407: UserWarning: Inconsistent values: penalty=l1 with l1_ratio=0.0. penalty is deprecated. Please use l1_ratio only.
+  warnings.warn(
+
+
+Modelo completo: AUC CV por paciente = 0.865 (folds 0.848-0.877) | AUC temporal = 0.869
+
+-- Aporte de cada grupo (pérdida de AUC al quitarlo) --
+           grupo  perdida_auc_al_quitar  folds_que_empeoran  auc_solo_grupo  perdida_auc_temporal
+  signos_vitales                 0.0570                   5          0.7011                0.0577
+  dx_secundarios                 0.0162                   5          0.7546                0.0207
+     aseguradora                 0.0040                   4          0.5835                0.0061
+      calendario                 0.0036                   5          0.5446                0.0010
+    sofa_inicial                 0.0030                   3          0.6131                0.0044
+ barthel_inicial                 0.0023                   5          0.5721                0.0048
+    news_inicial                 0.0015                   4          0.5557                0.0019
+procedencia_piso                 0.0013                   3          0.5477                0.0015
+            edad                 0.0011                   3          0.5496               -0.0004
+            peso                 0.0007                   3          0.5023               -0.0019
+    dx_principal                -0.0002                   3          0.7211               -0.0018
+            sexo                -0.0007                   2          0.5282                0.0006
+
+-- Permutación por variable (top 20) --
+                                    media  folds_positivos
+n_diagnosticos                     0.0471                5
+temp_piel                          0.0177                5
+aseguradora                        0.0170                5
+capitulo_dx                        0.0159                5
+ta_sistolica                       0.0137                5
+ta_diastolica                      0.0123                5
+fc                                 0.0115                5
+barthel_inicial                    0.0087                5
+puntuacion_sofa_inicial            0.0072                5
+dxa_desnutricion                   0.0066                5
+procedencia_piso                   0.0050                5
+mes_ingreso                        0.0028                4
+dia_semana_ingreso                 0.0025                5
+news_inicial                       0.0025                4
+edad                               0.0022                4
+dxp_arritmia                       0.0021                3
+tam                                0.0021                5
+dxp_cardiopatia_isquemica_cronica  0.0020                3
+dxa_hta                            0.0020                3
+dxa_arritmia                       0.0018                5
+
+-- Logística L1 (casos completos SOFA+Barthel, coeficientes estandarizados) --
+ta_diastolica                                        -0.729
+n_diagnosticos                                       -0.620
+dxa_desnutricion                                     -0.313
+aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA      -0.253
+dxa_hta                                              -0.243
+puntuacion_sofa_inicial                               0.236
+capitulo_dx_I                                         0.208
+dxp_arritmia                                          0.182
+dxp_cardiopatia_isquemica_cronica                     0.175
+tam                                                   0.160
+dxa_iam                                              -0.137
+dxa_arritmia                                          0.126
+dxa_neumonia                                          0.123
+procedencia_piso                                     -0.114
+capitulo_dx_Q                                         0.095
+aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS   -0.093
+capitulo_dx_F                                        -0.090
+dxp_sepsis                                            0.085
+aseguradora_EPS SURAMERICANA S A                     -0.082
+capitulo_dx_N                                        -0.080
+dxp_valvulopatia                                     -0.079
+dxa_erc                                               0.071
+dxp_acv                                               0.069
+fc                                                   -0.066
+dxp_neumonia                                          0.064
+
+Sensibilidad: AUC en casos CON SOFA = 0.855 | SIN SOFA = 0.876 | prevalencia con/sin SOFA = 0.26/0.39
+Sensibilidad: sin diagnósticos secundarios AUC = 0.848 (vs 0.865)
+
+-- Conjuntos candidatos (AUC CV por paciente | AUC temporal) --
+  todas (incluye variables con fuga)       0.865 (folds 0.848-0.877) | 0.869
+  BASE recomendada                         0.770 (folds 0.763-0.788) | 0.776
+  BASE + news_inicial                      0.772 (folds 0.765-0.785) | 0.784
+  BASE + dx_secundarios (fuga parcial)     0.802 (folds 0.786-0.813) | 0.812
+  BASE + signos_vitales (fuga)             0.841 (folds 0.831-0.849) | 0.847
+  BASE sin aseguradora                     0.763 (folds 0.756-0.775) | 0.767
+  BASE sin sofa                            0.750 (folds 0.734-0.761) | 0.762

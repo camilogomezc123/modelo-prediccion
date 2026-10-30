@@ -1,0 +1,25 @@
+{
+  "uci_prolongada": {
+    "objetivo": "Estancia en UCI > 7 días",
+    "modelo": "Ensamble (promedio de los 3)",
+    "auc_prueba": 0.686,
+    "ic95_prueba": "0.654-0.716",
+    "brier_prueba": 0.211,
+    "umbral_alto": 0.304,
+    "umbral_bajo": 0.187
+  },
+  "egreso_directo_uci": {
+    "objetivo": "Egreso de la clínica directamente desde UCI",
+    "modelo": "Ensamble (promedio de los 3)",
+    "auc_prueba": 0.738,
+    "ic95_prueba": "0.706-0.771",
+    "brier_prueba": 0.168,
+    "umbral_alto": 0.287,
+    "umbral_bajo": 0.154
+  },
+  "ocupacion": {
+    "modelo": "semi-Markov (Cox por causa + Cox de piso)",
+    "error_medio_camas_uci_7d": 2.33,
+    "error_medio_camas_piso_7d": 2.98
+  }
+}

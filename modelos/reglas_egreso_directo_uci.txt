@@ -1,0 +1,16 @@
+Reglas para: Egreso de la clínica directamente desde UCI (tasa global 26%). Árbol de profundidad 3 entrenado con toda la cohorte.
+
+SI NO dxp_arritmia Y puntuacion_sofa_inicial <= 9.5 Y NO capitulo_dx_E
+   -> 25% con el desenlace (n=3638) [medio]
+SI NO dxp_arritmia Y puntuacion_sofa_inicial <= 9.5 Y capitulo_dx_E
+   -> 8% con el desenlace (n=721) [BAJO]
+SI NO dxp_arritmia Y puntuacion_sofa_inicial > 9.5 Y puntuacion_sofa_inicial <= 13.5
+   -> 47% con el desenlace (n=211) [ALTO]
+SI NO dxp_arritmia Y puntuacion_sofa_inicial > 9.5 Y puntuacion_sofa_inicial > 13.5
+   -> 83% con el desenlace (n=64) [ALTO]
+SI dxp_arritmia Y NO aseguradora_ANGIOGRAFIA DE OCCIDENTE SA Y edad <= 71.5
+   -> 57% con el desenlace (n=82) [ALTO]
+SI dxp_arritmia Y NO aseguradora_ANGIOGRAFIA DE OCCIDENTE SA Y edad > 71.5
+   -> 31% con el desenlace (n=54) [medio]
+SI dxp_arritmia Y aseguradora_ANGIOGRAFIA DE OCCIDENTE SA
+   -> 86% con el desenlace (n=80) [ALTO]

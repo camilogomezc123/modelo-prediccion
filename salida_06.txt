@@ -1,0 +1,1784 @@
+Entrenamiento 3648 | prueba 1202 ingresos
+
+====================================================================================================
+A. MODELO MULTIESTADO DE MARKOV (UCI <-> HOSPITALIZACIÓN -> EGRESO)
+====================================================================================================
+
+-- A1. Transiciones observadas (conteo) --
+UCI -> HOSPITALIZACION       4151
+UCI -> EGRESO                1250
+HOSPITALIZACION -> UCI       1686
+HOSPITALIZACION -> EGRESO    3600
+
+-- A2. Matriz de intensidades Q (transiciones por paciente-día) --
+                    UCI  HOSPITALIZACION  EGRESO
+UCI             -0.1591           0.1223  0.0368
+HOSPITALIZACION  0.0396          -0.1240  0.0845
+EGRESO           0.0000           0.0000 -0.0000
+
+Estancia media por visita: UCI = 6.3 días | hospitalización = 8.1 días
+Probabilidad del siguiente estado al salir de UCI: piso 0.77, egreso 0.23 | al salir de piso: UCI 0.32, egreso 0.68
+
+-- A3. Probabilidad de estar en cada estado t días después de entrar a UCI (Markov) vs. observado --
+ día  P(UCI)  P(piso)  P(egreso)  observado: sigue en UCI
+   1   0.855    0.106      0.039                    0.836
+   3   0.634    0.242      0.124                    0.548
+   7   0.371    0.331      0.297                    0.256
+  14   0.173    0.278      0.549                    0.092
+  30   0.047    0.103      0.849                    0.014
+
+-- A4. Intensidades por grupo de SOFA inicial --
+SOFA    n  UCI->piso  UCI->egreso  piso->UCI  piso->egreso  días UCI/visita  P(egreso directo | sale de UCI)
+ 0-1 2082      0.164        0.053      0.049         0.113            4.609                            0.246
+ 2-4 1537      0.132        0.028      0.036         0.082            6.275                            0.173
+ 5-8  850      0.093        0.024      0.034         0.065            8.592                            0.204
+  >8  381      0.054        0.044      0.035         0.048           10.129                            0.448
+
+-- A5. Efecto de cada variable sobre cada transición (HR = razón de intensidades; * p<0,05) --
+                                  UCI->HOSP UCI->EGRE HOSP->UCI HOSP->EGRE
+edad                                   1.02      1.04      0.95       1.01
+procedencia_piso                      1.15*     0.69*     4.23*      0.47*
+dxp_desnutricion                      0.69*     0.23*      0.77      0.38*
+dxp_sepsis                            0.32*      1.37      0.77       0.5*
+dxp_neumonia                          0.42*     4.03*      1.08      0.54*
+dxp_falla_respiratoria                0.43*     2.91*      0.65       0.64
+dxp_iam                               1.33*      0.96     1.69*      1.61*
+dxp_cardiopatia_isquemica_cronica      0.98     1.45*      1.24      1.24*
+dxp_falla_cardiaca                     0.89      1.38       1.0      1.35*
+dxp_acv                               0.73*     1.64*      0.76      0.81*
+dxp_arritmia                           1.12     5.67*      1.54      2.22*
+dxp_valvulopatia                       1.05      0.64     1.34*       1.4*
+dxp_erc                                0.85      1.65       0.7      0.67*
+dxp_diabetes                           1.17      0.44      0.97       0.6*
+dxp_hta                               1.38*      0.68      0.84      1.45*
+dxp_hemorragia_digestiva               0.96      0.96      0.46       1.12
+aseg_EPS SURAMERICANA S A              1.07     1.34*     1.26*      1.44*
+aseg_ANGIOGRAFIA DE OCCIDENTE          1.06     2.68*     1.79*      1.47*
+aseg_ENTIDAD PROMOTORA DE SALU        0.85*      1.02     0.81*        0.9
+aseg_SALUD TOTAL EPS S SA             0.78*      0.84     0.77*      0.62*
+aseg_OTRA                              1.07      0.99      0.99       0.94
+aseg_COOSALUD ENTIDAD PROMOTOR         0.89       0.9      0.81       0.82
+aseg_COOMEVA MEDICINA PREPAGAD         1.28      0.86      2.19      1.89*
+aseg_SOS POS SERVICIO OCCIDENT         0.97      1.86      0.57       0.77
+cap_E                                  1.03      0.85      0.73      1.64*
+cap_C                                 0.68*      1.05     0.59*      0.64*
+cap_J                                  0.82     0.38*      1.04        1.1
+cap_K                                 0.76*      1.12      0.78       0.94
+cap_D                                  0.82      0.83      0.89        1.0
+cap_A                                  0.86      1.11      1.04       1.02
+cap_N                                  1.18      0.57      0.84       0.97
+
+====================================================================================================
+B. SUPERVIVENCIA: RIESGOS COMPETITIVOS Y COX
+====================================================================================================
+
+-- B1. Incidencia acumulada (Aalen-Johansen), un solo episodio de UCI (n=4357) --
+   grupo         destino  día 1  día 3  día 7  día 14  día 30
+   todos traslado a piso  0.031  0.236  0.520   0.658   0.724
+   todos  egreso directo  0.043  0.140  0.210   0.245   0.260
+SOFA 0-1 traslado a piso  0.044  0.307  0.577   0.676   0.709
+SOFA 0-1  egreso directo  0.063  0.190  0.261   0.277   0.283
+SOFA 2-4 traslado a piso  0.024  0.248  0.576   0.732   0.800
+SOFA 2-4  egreso directo  0.024  0.085  0.144   0.174   0.188
+SOFA 5-8 traslado a piso  0.007  0.131  0.447   0.627   0.747
+SOFA 5-8  egreso directo  0.019  0.068  0.144   0.197   0.225
+ SOFA >8 traslado a piso  0.000  0.021  0.123   0.305   0.443
+ SOFA >8  egreso directo  0.082  0.243  0.364   0.460   0.507
+
+-- B2. Cox para días en UCI (HR > 1 = sale antes de UCI; * p<0,05) --
+covariate
+edad                                  1.01
+procedencia_piso                      1.04
+dxp_desnutricion                      0.6*
+dxp_sepsis                           0.57*
+dxp_neumonia                         0.73*
+dxp_falla_respiratoria               0.66*
+dxp_iam                              1.17*
+dxp_cardiopatia_isquemica_cronica     1.02
+dxp_falla_cardiaca                    1.02
+dxp_acv                               0.92
+dxp_arritmia                         2.52*
+dxp_valvulopatia                      0.87
+dxp_erc                               0.93
+dxp_diabetes                          1.01
+dxp_hta                              1.28*
+dxp_hemorragia_digestiva              1.02
+aseg_EPS SURAMERICANA S A             1.2*
+aseg_ANGIOGRAFIA DE OCCIDENTE        1.43*
+aseg_ENTIDAD PROMOTORA DE SALU        0.91
+aseg_SALUD TOTAL EPS S SA            0.76*
+aseg_OTRA                             0.96
+aseg_COOSALUD ENTIDAD PROMOTOR        0.89
+aseg_COOMEVA MEDICINA PREPAGAD        1.26
+aseg_SOS POS SERVICIO OCCIDENT        1.08
+cap_E                                 0.99
+cap_C                                0.76*
+cap_J                                0.76*
+cap_K                                0.82*
+cap_D                                 0.87
+cap_A                                 0.92
+cap_N                                 1.06
+Índice C en prueba: 0.606
+
+====================================================================================================
+C. CLASIFICADORES: CLÁSICOS Y MACHINE LEARNING
+====================================================================================================
+
+### Estancia en UCI > 7 días: árbol de decisión elegido por CV: profundidad 8, mínimo 50 por hoja
+
+-- SHAP (LightGBM): impacto medio |SHAP| por variable, datos de prueba --
+puntuacion_sofa_inicial              0.4594
+capitulo_dx                          0.2851
+aseguradora                          0.2830
+edad                                 0.1957
+barthel_inicial                      0.1127
+dxp_desnutricion                     0.1113
+procedencia_piso                     0.0845
+dxp_arritmia                         0.0571
+dxp_hta                              0.0347
+dxp_acv                              0.0246
+dxp_diabetes                         0.0238
+dxp_cardiopatia_isquemica_cronica    0.0228
+dxp_sepsis                           0.0199
+dxp_falla_cardiaca                   0.0165
+dxp_iam                              0.0155
+dxp_valvulopatia                     0.0113
+dxp_neumonia                         0.0098
+dxp_trauma                           0.0065
+dxp_obstetrico                       0.0059
+dxp_cancer                           0.0047
+dxp_erc                              0.0028
+
+-- Reglas del árbol interpretable (profundidad 3); 'class' = desenlace más probable --
+|--- puntuacion_sofa_inicial <= 4.5
+|   |--- dxp_desnutricion <= 0.5
+|   |   |--- puntuacion_sofa_inicial <= 1.5
+|   |   |   |--- aseguradora_EPS SURAMERICANA S A <= 0.5
+|   |   |   |   |--- dxp_arritmia <= 0.5
+|   |   |   |   |   |--- edad <= 80.5
+|   |   |   |   |   |   |--- dxp_valvulopatia <= 0.5
+|   |   |   |   |   |   |   |--- capitulo_dx_J <= 0.5
+|   |   |   |   |   |   |   |   |--- capitulo_dx_T <= 0.5
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 97.5
+|   |   |   |   |   |   |   |   |   |   |--- dxp_hemorragia_digestiva <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 17
+|   |   |   |   |   |   |   |   |   |   |--- dxp_hemorragia_digestiva >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial >  97.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 73.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 21
+|   |   |   |   |   |   |   |   |   |   |--- edad >  73.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 19
+|   |   |   |   |   |   |   |   |--- capitulo_dx_T >  0.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 52.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 3.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- edad >  52.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- capitulo_dx_J >  0.5
+|   |   |   |   |   |   |   |   |--- edad <= 52.5
+|   |   |   |   |   |   |   |   |   |--- dxp_falla_respiratoria <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- dxp_neumonia <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [8.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- dxp_neumonia >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |--- dxp_falla_respiratoria >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |--- edad >  52.5
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 67.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial >  67.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 7.0] class: 1
+|   |   |   |   |   |   |--- dxp_valvulopatia >  0.5
+|   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 0.5
+|   |   |   |   |   |   |   |   |--- aseguradora_ANGIOGRAFIA DE OCCIDENTE SA <= 0.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 69.0
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 61.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 3.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- edad >  61.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- edad >  69.0
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 5.0] class: 1
+|   |   |   |   |   |   |   |   |--- aseguradora_ANGIOGRAFIA DE OCCIDENTE SA >  0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  0.5
+|   |   |   |   |   |   |   |   |--- edad <= 51.0
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |--- edad >  51.0
+|   |   |   |   |   |   |   |   |   |--- weights: [9.0, 0.0] class: 0
+|   |   |   |   |   |--- edad >  80.5
+|   |   |   |   |   |   |--- capitulo_dx_L <= 0.5
+|   |   |   |   |   |   |   |--- aseguradora_SALUD TOTAL EPS S SA <= 0.5
+|   |   |   |   |   |   |   |   |--- capitulo_dx_T <= 0.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 95.5
+|   |   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 92.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 7
+|   |   |   |   |   |   |   |   |   |   |--- barthel_inicial >  92.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 15
+|   |   |   |   |   |   |   |   |   |--- edad >  95.5
+|   |   |   |   |   |   |   |   |   |   |--- dxp_diabetes <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- dxp_diabetes >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- capitulo_dx_T >  0.5
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 85.0
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial >  85.0
+|   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- aseguradora_SALUD TOTAL EPS S SA >  0.5
+|   |   |   |   |   |   |   |   |--- barthel_inicial <= 97.5
+|   |   |   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- barthel_inicial >  97.5
+|   |   |   |   |   |   |   |   |   |--- procedencia_piso <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- procedencia_piso >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 83.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- edad >  83.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |--- capitulo_dx_L >  0.5
+|   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |--- dxp_arritmia >  0.5
+|   |   |   |   |   |--- edad <= 80.5
+|   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA <= 0.5
+|   |   |   |   |   |   |   |--- weights: [69.0, 0.0] class: 0
+|   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA >  0.5
+|   |   |   |   |   |   |   |--- edad <= 34.0
+|   |   |   |   |   |   |   |   |--- edad <= 28.0
+|   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- edad >  28.0
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |--- edad >  34.0
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [21.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  0.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 70.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 69.0
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 5
+|   |   |   |   |   |   |   |   |   |   |--- edad >  69.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- edad >  70.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [5.0, 0.0] class: 0
+|   |   |   |   |   |--- edad >  80.5
+|   |   |   |   |   |   |--- edad <= 83.5
+|   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 0.5
+|   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  0.5
+|   |   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS <= 0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [1.0, 1.0] class: 0
+|   |   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS >  0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |--- edad >  83.5
+|   |   |   |   |   |   |   |--- barthel_inicial <= 87.5
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- barthel_inicial >  87.5
+|   |   |   |   |   |   |   |   |--- weights: [9.0, 0.0] class: 0
+|   |   |   |--- aseguradora_EPS SURAMERICANA S A >  0.5
+|   |   |   |   |--- barthel_inicial <= 82.5
+|   |   |   |   |   |--- edad <= 76.5
+|   |   |   |   |   |   |--- capitulo_dx_I <= 0.5
+|   |   |   |   |   |   |   |--- edad <= 66.0
+|   |   |   |   |   |   |   |   |--- edad <= 61.0
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 62.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 27.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- edad >  27.0
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 4
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial >  62.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |--- edad >  61.0
+|   |   |   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- edad >  66.0
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |--- capitulo_dx_I >  0.5
+|   |   |   |   |   |   |   |--- weights: [5.0, 0.0] class: 0
+|   |   |   |   |   |--- edad >  76.5
+|   |   |   |   |   |   |--- capitulo_dx_E <= 0.5
+|   |   |   |   |   |   |   |--- weights: [12.0, 0.0] class: 0
+|   |   |   |   |   |   |--- capitulo_dx_E >  0.5
+|   |   |   |   |   |   |   |--- edad <= 85.0
+|   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- edad >  85.0
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |--- barthel_inicial >  82.5
+|   |   |   |   |   |--- capitulo_dx_K <= 0.5
+|   |   |   |   |   |   |--- capitulo_dx_J <= 0.5
+|   |   |   |   |   |   |   |--- capitulo_dx_G <= 0.5
+|   |   |   |   |   |   |   |   |--- barthel_inicial <= 97.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 29.0
+|   |   |   |   |   |   |   |   |   |   |--- capitulo_dx_D <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- capitulo_dx_D >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- edad >  29.0
+|   |   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 92.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [11.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- barthel_inicial >  92.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 3
+|   |   |   |   |   |   |   |   |--- barthel_inicial >  97.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 35.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [77.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- edad >  35.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 86.0
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 9
+|   |   |   |   |   |   |   |   |   |   |--- edad >  86.0
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |--- capitulo_dx_G >  0.5
+|   |   |   |   |   |   |   |   |--- edad <= 62.0
+|   |   |   |   |   |   |   |   |   |--- edad <= 49.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 25.0
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |   |--- edad >  25.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- edad >  49.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |--- edad >  62.0
+|   |   |   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |--- capitulo_dx_J >  0.5
+|   |   |   |   |   |   |   |--- edad <= 46.5
+|   |   |   |   |   |   |   |   |--- weights: [5.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- edad >  46.5
+|   |   |   |   |   |   |   |   |--- edad <= 56.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 3.0] class: 1
+|   |   |   |   |   |   |   |   |--- edad >  56.5
+|   |   |   |   |   |   |   |   |   |--- weights: [4.0, 0.0] class: 0
+|   |   |   |   |   |--- capitulo_dx_K >  0.5
+|   |   |   |   |   |   |--- dxp_hemorragia_digestiva <= 0.5
+|   |   |   |   |   |   |   |--- edad <= 67.0
+|   |   |   |   |   |   |   |   |--- edad <= 33.0
+|   |   |   |   |   |   |   |   |   |--- edad <= 25.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- edad >  25.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |--- edad >  33.0
+|   |   |   |   |   |   |   |   |   |--- edad <= 56.0
+|   |   |   |   |   |   |   |   |   |   |--- weights: [6.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- edad >  56.0
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 60.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- edad >  60.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- edad >  67.0
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 0.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 76.0
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- edad >  76.0
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 81.0
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |   |--- edad >  81.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |--- dxp_hemorragia_digestiva >  0.5
+|   |   |   |   |   |   |   |--- weights: [8.0, 0.0] class: 0
+|   |   |--- puntuacion_sofa_inicial >  1.5
+|   |   |   |--- dxp_sepsis <= 0.5
+|   |   |   |   |--- capitulo_dx_C <= 0.5
+|   |   |   |   |   |--- aseguradora_COOSALUD ENTIDAD PROMOTORA DE SALUD SA <= 0.5
+|   |   |   |   |   |   |--- capitulo_dx_J <= 0.5
+|   |   |   |   |   |   |   |--- edad <= 71.5
+|   |   |   |   |   |   |   |   |--- barthel_inicial <= 65.0
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 47.5
+|   |   |   |   |   |   |   |   |   |   |--- dxp_acv <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [6.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- dxp_acv >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial >  47.5
+|   |   |   |   |   |   |   |   |   |   |--- capitulo_dx_K <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |   |--- capitulo_dx_K >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- barthel_inicial >  65.0
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 3.5
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_SALUD TOTAL EPS S SA <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 26
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_SALUD TOTAL EPS S SA >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 9
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  3.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 58.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 12
+|   |   |   |   |   |   |   |   |   |   |--- edad >  58.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 8
+|   |   |   |   |   |   |   |--- edad >  71.5
+|   |   |   |   |   |   |   |   |--- capitulo_dx_D <= 0.5
+|   |   |   |   |   |   |   |   |   |--- aseguradora_OTRA <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- dxp_cardiopatia_isquemica_cronica <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 19
+|   |   |   |   |   |   |   |   |   |   |--- dxp_cardiopatia_isquemica_cronica >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 9
+|   |   |   |   |   |   |   |   |   |--- aseguradora_OTRA >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 74.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- edad >  74.0
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 3
+|   |   |   |   |   |   |   |   |--- capitulo_dx_D >  0.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 77.0
+|   |   |   |   |   |   |   |   |   |   |--- weights: [4.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- edad >  77.0
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_EPS SURAMERICANA S A <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 6.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_EPS SURAMERICANA S A >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |--- capitulo_dx_J >  0.5
+|   |   |   |   |   |   |   |--- edad <= 80.5
+|   |   |   |   |   |   |   |   |--- aseguradora_EPS SURAMERICANA S A <= 0.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 68.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 49.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [4.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- edad >  49.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 3
+|   |   |   |   |   |   |   |   |   |--- edad >  68.5
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_OTRA <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 6
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_OTRA >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |--- aseguradora_EPS SURAMERICANA S A >  0.5
+|   |   |   |   |   |   |   |   |   |--- dxp_falla_respiratoria <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [16.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- dxp_falla_respiratoria >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- procedencia_piso <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- procedencia_piso >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- edad >  80.5
+|   |   |   |   |   |   |   |   |--- edad <= 82.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 5.0] class: 1
+|   |   |   |   |   |   |   |   |--- edad >  82.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 87.0
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 83.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |   |--- edad >  83.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- edad >  87.0
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 91.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 3.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- edad >  91.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |--- aseguradora_COOSALUD ENTIDAD PROMOTORA DE SALUD SA >  0.5
+|   |   |   |   |   |   |--- edad <= 66.0
+|   |   |   |   |   |   |   |--- weights: [0.0, 6.0] class: 1
+|   |   |   |   |   |   |--- edad >  66.0
+|   |   |   |   |   |   |   |--- edad <= 75.0
+|   |   |   |   |   |   |   |   |--- weights: [4.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- edad >  75.0
+|   |   |   |   |   |   |   |   |--- barthel_inicial <= 95.0
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |--- barthel_inicial >  95.0
+|   |   |   |   |   |   |   |   |   |--- capitulo_dx_I <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- capitulo_dx_I >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 80.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- edad >  80.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |--- capitulo_dx_C >  0.5
+|   |   |   |   |   |--- barthel_inicial <= 35.0
+|   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 3.5
+|   |   |   |   |   |   |   |--- weights: [0.0, 5.0] class: 1
+|   |   |   |   |   |   |--- puntuacion_sofa_inicial >  3.5
+|   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |--- barthel_inicial >  35.0
+|   |   |   |   |   |   |--- edad <= 68.5
+|   |   |   |   |   |   |   |--- edad <= 52.5
+|   |   |   |   |   |   |   |   |--- barthel_inicial <= 97.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 49.0
+|   |   |   |   |   |   |   |   |   |   |--- weights: [5.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- edad >  49.0
+|   |   |   |   |   |   |   |   |   |   |--- procedencia_piso <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- procedencia_piso >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- barthel_inicial >  97.5
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 2.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 3.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  2.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 41.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- edad >  41.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 5
+|   |   |   |   |   |   |   |--- edad >  52.5
+|   |   |   |   |   |   |   |   |--- edad <= 63.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 58.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 57.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 3
+|   |   |   |   |   |   |   |   |   |   |--- edad >  57.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |--- edad >  58.5
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_COOSALUD ENTIDAD PROMOTORA DE SALUD SA <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_COOSALUD ENTIDAD PROMOTORA DE SALUD SA >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- edad >  63.5
+|   |   |   |   |   |   |   |   |   |--- aseguradora_SALUD TOTAL EPS S SA <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [9.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- aseguradora_SALUD TOTAL EPS S SA >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 67.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- edad >  67.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |--- edad >  68.5
+|   |   |   |   |   |   |   |--- procedencia_piso <= 0.5
+|   |   |   |   |   |   |   |   |--- barthel_inicial <= 52.5
+|   |   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- barthel_inicial >  52.5
+|   |   |   |   |   |   |   |   |   |--- aseguradora_OTRA <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 75.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 3
+|   |   |   |   |   |   |   |   |   |   |--- edad >  75.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 5
+|   |   |   |   |   |   |   |   |   |--- aseguradora_OTRA >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |--- procedencia_piso >  0.5
+|   |   |   |   |   |   |   |   |--- edad <= 75.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 3.0] class: 1
+|   |   |   |   |   |   |   |   |--- edad >  75.5
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 2.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  2.5
+|   |   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 57.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- barthel_inicial >  57.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 4.0] class: 1
+|   |   |   |--- dxp_sepsis >  0.5
+|   |   |   |   |--- edad <= 75.0
+|   |   |   |   |   |--- edad <= 53.0
+|   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |--- edad >  53.0
+|   |   |   |   |   |   |--- weights: [0.0, 9.0] class: 1
+|   |   |   |   |--- edad >  75.0
+|   |   |   |   |   |--- barthel_inicial <= 97.5
+|   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |--- barthel_inicial >  97.5
+|   |   |   |   |   |   |--- edad <= 81.0
+|   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |--- edad >  81.0
+|   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |--- dxp_desnutricion >  0.5
+|   |   |--- aseguradora_SALUD TOTAL EPS S SA <= 0.5
+|   |   |   |--- edad <= 19.5
+|   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |--- edad >  19.5
+|   |   |   |   |--- edad <= 90.5
+|   |   |   |   |   |--- barthel_inicial <= 87.5
+|   |   |   |   |   |   |--- edad <= 88.5
+|   |   |   |   |   |   |   |--- barthel_inicial <= 25.0
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 2.5
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  2.5
+|   |   |   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- procedencia_piso <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |   |--- procedencia_piso >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |--- barthel_inicial >  25.0
+|   |   |   |   |   |   |   |   |--- barthel_inicial <= 57.5
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 47.5
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 3
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 4
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial >  47.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [7.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- barthel_inicial >  57.5
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 3.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 86.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 9
+|   |   |   |   |   |   |   |   |   |   |--- edad >  86.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  3.5
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_EPS SURAMERICANA S A <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [9.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_EPS SURAMERICANA S A >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |--- edad >  88.5
+|   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |--- barthel_inicial >  87.5
+|   |   |   |   |   |   |--- edad <= 55.5
+|   |   |   |   |   |   |   |--- procedencia_piso <= 0.5
+|   |   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS <= 0.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 36.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 23.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- edad >  23.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 4.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- edad >  36.5
+|   |   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 2.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 6
+|   |   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  2.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [4.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS >  0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 4.0] class: 1
+|   |   |   |   |   |   |   |--- procedencia_piso >  0.5
+|   |   |   |   |   |   |   |   |--- edad <= 45.0
+|   |   |   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- edad >  45.0
+|   |   |   |   |   |   |   |   |   |--- edad <= 50.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- edad >  50.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |--- edad >  55.5
+|   |   |   |   |   |   |   |--- edad <= 61.5
+|   |   |   |   |   |   |   |   |--- weights: [9.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- edad >  61.5
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 3.5
+|   |   |   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 12
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 10
+|   |   |   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 74.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [5.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- edad >  74.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  3.5
+|   |   |   |   |   |   |   |   |   |--- procedencia_piso <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 82.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 4
+|   |   |   |   |   |   |   |   |   |   |--- edad >  82.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- procedencia_piso >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 4.0] class: 1
+|   |   |   |   |--- edad >  90.5
+|   |   |   |   |   |--- weights: [4.0, 0.0] class: 0
+|   |   |--- aseguradora_SALUD TOTAL EPS S SA >  0.5
+|   |   |   |--- edad <= 36.0
+|   |   |   |   |--- barthel_inicial <= 60.0
+|   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |--- barthel_inicial >  60.0
+|   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |--- edad >  36.0
+|   |   |   |   |--- barthel_inicial <= 97.5
+|   |   |   |   |   |--- edad <= 56.0
+|   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |--- edad >  56.0
+|   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |--- barthel_inicial >  97.5
+|   |   |   |   |   |--- weights: [0.0, 9.0] class: 1
+|--- puntuacion_sofa_inicial >  4.5
+|   |--- dxp_desnutricion <= 0.5
+|   |   |--- puntuacion_sofa_inicial <= 7.5
+|   |   |   |--- dxp_hta <= 0.5
+|   |   |   |   |--- barthel_inicial <= 22.5
+|   |   |   |   |   |--- edad <= 51.5
+|   |   |   |   |   |   |--- aseguradora_COOSALUD ENTIDAD PROMOTORA DE SALUD SA <= 0.5
+|   |   |   |   |   |   |   |--- weights: [4.0, 0.0] class: 0
+|   |   |   |   |   |   |--- aseguradora_COOSALUD ENTIDAD PROMOTORA DE SALUD SA >  0.5
+|   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |--- edad >  51.5
+|   |   |   |   |   |   |--- edad <= 69.5
+|   |   |   |   |   |   |   |--- weights: [0.0, 5.0] class: 1
+|   |   |   |   |   |   |--- edad >  69.5
+|   |   |   |   |   |   |   |--- edad <= 73.5
+|   |   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- edad >  73.5
+|   |   |   |   |   |   |   |   |--- dxp_erc <= 0.5
+|   |   |   |   |   |   |   |   |   |--- dxp_acv <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 6.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- dxp_acv >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 5.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  5.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |--- dxp_erc >  0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |--- barthel_inicial >  22.5
+|   |   |   |   |   |--- edad <= 62.5
+|   |   |   |   |   |   |--- aseguradora_OTRA <= 0.5
+|   |   |   |   |   |   |   |--- capitulo_dx_M <= 0.5
+|   |   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS <= 0.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 29.5
+|   |   |   |   |   |   |   |   |   |   |--- dxp_trauma <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [10.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- dxp_trauma >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |--- edad >  29.5
+|   |   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 97.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 5
+|   |   |   |   |   |   |   |   |   |   |--- barthel_inicial >  97.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 8
+|   |   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS >  0.5
+|   |   |   |   |   |   |   |   |   |--- procedencia_piso <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 29.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 3
+|   |   |   |   |   |   |   |   |   |   |--- edad >  29.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 9
+|   |   |   |   |   |   |   |   |   |--- procedencia_piso >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 4.0] class: 1
+|   |   |   |   |   |   |   |--- capitulo_dx_M >  0.5
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 3.0] class: 1
+|   |   |   |   |   |   |--- aseguradora_OTRA >  0.5
+|   |   |   |   |   |   |   |--- weights: [0.0, 4.0] class: 1
+|   |   |   |   |   |--- edad >  62.5
+|   |   |   |   |   |   |--- edad <= 69.5
+|   |   |   |   |   |   |   |--- aseguradora_OTRA <= 0.5
+|   |   |   |   |   |   |   |   |--- dxp_erc <= 0.5
+|   |   |   |   |   |   |   |   |   |--- capitulo_dx_C <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_EPS SURAMERICANA S A <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 8
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_EPS SURAMERICANA S A >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [16.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- capitulo_dx_C >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 67.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |   |--- edad >  67.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |--- dxp_erc >  0.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 64.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- edad >  64.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 67.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- edad >  67.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- aseguradora_OTRA >  0.5
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 6.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  6.5
+|   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |--- edad >  69.5
+|   |   |   |   |   |   |   |--- procedencia_piso <= 0.5
+|   |   |   |   |   |   |   |   |--- edad <= 84.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 81.5
+|   |   |   |   |   |   |   |   |   |   |--- dxp_acv <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 13
+|   |   |   |   |   |   |   |   |   |   |--- dxp_acv >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 4
+|   |   |   |   |   |   |   |   |   |--- edad >  81.5
+|   |   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 72.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- barthel_inicial >  72.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 5.0] class: 1
+|   |   |   |   |   |   |   |   |--- edad >  84.5
+|   |   |   |   |   |   |   |   |   |--- capitulo_dx_A <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- dxp_trauma <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 6
+|   |   |   |   |   |   |   |   |   |   |--- dxp_trauma >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- capitulo_dx_A >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 88.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- edad >  88.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- procedencia_piso >  0.5
+|   |   |   |   |   |   |   |   |--- capitulo_dx_L <= 0.5
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 92.5
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 3
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial >  92.5
+|   |   |   |   |   |   |   |   |   |   |--- capitulo_dx_K <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [21.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- capitulo_dx_K >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 3
+|   |   |   |   |   |   |   |   |--- capitulo_dx_L >  0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |--- dxp_hta >  0.5
+|   |   |   |   |--- edad <= 25.5
+|   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |--- edad >  25.5
+|   |   |   |   |   |--- weights: [14.0, 0.0] class: 0
+|   |   |--- puntuacion_sofa_inicial >  7.5
+|   |   |   |--- puntuacion_sofa_inicial <= 13.5
+|   |   |   |   |--- aseguradora_ANGIOGRAFIA DE OCCIDENTE SA <= 0.5
+|   |   |   |   |   |--- barthel_inicial <= 77.5
+|   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS <= 0.5
+|   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA <= 0.5
+|   |   |   |   |   |   |   |   |--- edad <= 54.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |--- edad >  54.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 77.5
+|   |   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 2.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- barthel_inicial >  2.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 4
+|   |   |   |   |   |   |   |   |   |--- edad >  77.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [13.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA >  0.5
+|   |   |   |   |   |   |   |   |--- edad <= 76.5
+|   |   |   |   |   |   |   |   |   |--- capitulo_dx_J <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 12.0
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 5
+|   |   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  12.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- capitulo_dx_J >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |--- edad >  76.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 86.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 7.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- edad >  86.5
+|   |   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 9.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  9.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS >  0.5
+|   |   |   |   |   |   |   |--- edad <= 69.5
+|   |   |   |   |   |   |   |   |--- dxp_acv <= 0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- dxp_acv >  0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |--- edad >  69.5
+|   |   |   |   |   |   |   |   |--- capitulo_dx_I <= 0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 9.0] class: 1
+|   |   |   |   |   |   |   |   |--- capitulo_dx_I >  0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |--- barthel_inicial >  77.5
+|   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA <= 0.5
+|   |   |   |   |   |   |   |--- procedencia_piso <= 0.5
+|   |   |   |   |   |   |   |   |--- capitulo_dx_D <= 0.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 26.0
+|   |   |   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- edad >  26.0
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 85.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 8
+|   |   |   |   |   |   |   |   |   |   |--- edad >  85.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |--- capitulo_dx_D >  0.5
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 9.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  9.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 26.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- edad >  26.0
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |--- procedencia_piso >  0.5
+|   |   |   |   |   |   |   |   |--- barthel_inicial <= 85.0
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 3.0] class: 1
+|   |   |   |   |   |   |   |   |--- barthel_inicial >  85.0
+|   |   |   |   |   |   |   |   |   |--- dxp_neumonia <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- capitulo_dx_I <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 5
+|   |   |   |   |   |   |   |   |   |   |--- capitulo_dx_I >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |--- dxp_neumonia >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [5.0, 0.0] class: 0
+|   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA >  0.5
+|   |   |   |   |   |   |   |--- capitulo_dx_J <= 0.5
+|   |   |   |   |   |   |   |   |--- dxp_acv <= 0.5
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 97.5
+|   |   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 8.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 3
+|   |   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  8.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 3
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial >  97.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 63.0
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |   |--- edad >  63.0
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 8
+|   |   |   |   |   |   |   |   |--- dxp_acv >  0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 4.0] class: 1
+|   |   |   |   |   |   |   |--- capitulo_dx_J >  0.5
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 5.0] class: 1
+|   |   |   |   |--- aseguradora_ANGIOGRAFIA DE OCCIDENTE SA >  0.5
+|   |   |   |   |   |--- edad <= 75.0
+|   |   |   |   |   |   |--- weights: [10.0, 0.0] class: 0
+|   |   |   |   |   |--- edad >  75.0
+|   |   |   |   |   |   |--- edad <= 81.5
+|   |   |   |   |   |   |   |--- dxp_acv <= 0.5
+|   |   |   |   |   |   |   |   |--- dxp_iam <= 0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 5.0] class: 1
+|   |   |   |   |   |   |   |   |--- dxp_iam >  0.5
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 82.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial >  82.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- dxp_acv >  0.5
+|   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |--- edad >  81.5
+|   |   |   |   |   |   |   |--- dxp_falla_cardiaca <= 0.5
+|   |   |   |   |   |   |   |   |--- weights: [6.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- dxp_falla_cardiaca >  0.5
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |--- puntuacion_sofa_inicial >  13.5
+|   |   |   |   |--- edad <= 69.0
+|   |   |   |   |   |--- barthel_inicial <= 35.0
+|   |   |   |   |   |   |--- weights: [0.0, 3.0] class: 1
+|   |   |   |   |   |--- barthel_inicial >  35.0
+|   |   |   |   |   |   |--- edad <= 34.5
+|   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |--- edad >  34.5
+|   |   |   |   |   |   |   |--- capitulo_dx_I <= 0.5
+|   |   |   |   |   |   |   |   |--- capitulo_dx_F <= 0.5
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 15.5
+|   |   |   |   |   |   |   |   |   |   |--- capitulo_dx_K <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 3
+|   |   |   |   |   |   |   |   |   |   |--- capitulo_dx_K >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  15.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [5.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- capitulo_dx_F >  0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |--- capitulo_dx_I >  0.5
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |--- edad >  69.0
+|   |   |   |   |   |--- capitulo_dx_G <= 0.5
+|   |   |   |   |   |   |--- dxp_sepsis <= 0.5
+|   |   |   |   |   |   |   |--- weights: [13.0, 0.0] class: 0
+|   |   |   |   |   |   |--- dxp_sepsis >  0.5
+|   |   |   |   |   |   |   |--- barthel_inicial <= 77.5
+|   |   |   |   |   |   |   |   |--- edad <= 75.5
+|   |   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- edad >  75.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |--- barthel_inicial >  77.5
+|   |   |   |   |   |   |   |   |--- weights: [5.0, 0.0] class: 0
+|   |   |   |   |   |--- capitulo_dx_G >  0.5
+|   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |--- dxp_desnutricion >  0.5
+|   |   |--- barthel_inicial <= 67.5
+|   |   |   |--- barthel_inicial <= 20.0
+|   |   |   |   |--- edad <= 44.5
+|   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |--- edad >  44.5
+|   |   |   |   |   |--- weights: [0.0, 6.0] class: 1
+|   |   |   |--- barthel_inicial >  20.0
+|   |   |   |   |--- puntuacion_sofa_inicial <= 10.0
+|   |   |   |   |   |--- barthel_inicial <= 52.5
+|   |   |   |   |   |   |--- barthel_inicial <= 42.5
+|   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA <= 0.5
+|   |   |   |   |   |   |   |   |--- edad <= 76.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 67.5
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_EPS SURAMERICANA S A <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_EPS SURAMERICANA S A >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- edad >  67.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- edad >  76.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA >  0.5
+|   |   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |--- barthel_inicial >  42.5
+|   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA <= 0.5
+|   |   |   |   |   |   |   |   |--- aseguradora_OTRA <= 0.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 68.5
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_EPS SURAMERICANA S A <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_EPS SURAMERICANA S A >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- edad >  68.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |--- aseguradora_OTRA >  0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA >  0.5
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 4.0] class: 1
+|   |   |   |   |   |--- barthel_inicial >  52.5
+|   |   |   |   |   |   |--- procedencia_piso <= 0.5
+|   |   |   |   |   |   |   |--- weights: [8.0, 0.0] class: 0
+|   |   |   |   |   |   |--- procedencia_piso >  0.5
+|   |   |   |   |   |   |   |--- edad <= 60.5
+|   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- edad >  60.5
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |--- puntuacion_sofa_inicial >  10.0
+|   |   |   |   |   |--- aseguradora_SALUD TOTAL EPS S SA <= 0.5
+|   |   |   |   |   |   |--- weights: [0.0, 4.0] class: 1
+|   |   |   |   |   |--- aseguradora_SALUD TOTAL EPS S SA >  0.5
+|   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |--- barthel_inicial >  67.5
+|   |   |   |--- puntuacion_sofa_inicial <= 10.5
+|   |   |   |   |--- aseguradora_COOSALUD ENTIDAD PROMOTORA DE SALUD SA <= 0.5
+|   |   |   |   |   |--- edad <= 89.0
+|   |   |   |   |   |   |--- edad <= 86.5
+|   |   |   |   |   |   |   |--- edad <= 82.5
+|   |   |   |   |   |   |   |   |--- edad <= 81.5
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 72.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 3.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial >  72.5
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 12
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 3
+|   |   |   |   |   |   |   |   |--- edad >  81.5
+|   |   |   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- edad >  82.5
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 5.0] class: 1
+|   |   |   |   |   |   |--- edad >  86.5
+|   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 8.0
+|   |   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  8.0
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |--- edad >  89.0
+|   |   |   |   |   |   |--- weights: [0.0, 3.0] class: 1
+|   |   |   |   |--- aseguradora_COOSALUD ENTIDAD PROMOTORA DE SALUD SA >  0.5
+|   |   |   |   |   |--- weights: [0.0, 5.0] class: 1
+|   |   |   |--- puntuacion_sofa_inicial >  10.5
+|   |   |   |   |--- edad <= 84.0
+|   |   |   |   |   |--- procedencia_piso <= 0.5
+|   |   |   |   |   |   |--- weights: [0.0, 10.0] class: 1
+|   |   |   |   |   |--- procedencia_piso >  0.5
+|   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 11.5
+|   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |--- puntuacion_sofa_inicial >  11.5
+|   |   |   |   |   |   |   |--- aseguradora_OTRA <= 0.5
+|   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- aseguradora_OTRA >  0.5
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |--- edad >  84.0
+|   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+
+
+### Salida de la clínica directamente desde UCI (condición de egreso desconocida): árbol de decisión elegido por CV: profundidad 8, mínimo 50 por hoja
+
+-- SHAP (LightGBM): impacto medio |SHAP| por variable, datos de prueba --
+capitulo_dx                          0.4936
+puntuacion_sofa_inicial              0.3241
+edad                                 0.2015
+barthel_inicial                      0.1524
+aseguradora                          0.1513
+procedencia_piso                     0.1390
+dxp_desnutricion                     0.1255
+dxp_arritmia                         0.0936
+dxp_hta                              0.0563
+dxp_acv                              0.0494
+dxp_neumonia                         0.0474
+dxp_iam                              0.0402
+dxp_sepsis                           0.0400
+dxp_cardiopatia_isquemica_cronica    0.0284
+dxp_valvulopatia                     0.0139
+dxp_diabetes                         0.0102
+dxp_falla_cardiaca                   0.0084
+dxp_erc                              0.0052
+dxp_cancer                           0.0038
+dxp_trauma                           0.0014
+dxp_obstetrico                       0.0006
+
+-- Reglas del árbol interpretable (profundidad 3); 'class' = desenlace más probable --
+|--- dxp_arritmia <= 0.5
+|   |--- puntuacion_sofa_inicial <= 8.5
+|   |   |--- capitulo_dx_E <= 0.5
+|   |   |   |--- aseguradora_ANGIOGRAFIA DE OCCIDENTE SA <= 0.5
+|   |   |   |   |--- dxp_neumonia <= 0.5
+|   |   |   |   |   |--- dxp_acv <= 0.5
+|   |   |   |   |   |   |--- dxp_sepsis <= 0.5
+|   |   |   |   |   |   |   |--- edad <= 82.5
+|   |   |   |   |   |   |   |   |--- dxp_cardiopatia_isquemica_cronica <= 0.5
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 2.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 78.0
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 3
+|   |   |   |   |   |   |   |   |   |   |--- edad >  78.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial >  2.5
+|   |   |   |   |   |   |   |   |   |   |--- capitulo_dx_Q <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 26
+|   |   |   |   |   |   |   |   |   |   |--- capitulo_dx_Q >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 6
+|   |   |   |   |   |   |   |   |--- dxp_cardiopatia_isquemica_cronica >  0.5
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 87.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [19.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial >  87.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 71.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 15
+|   |   |   |   |   |   |   |   |   |   |--- edad >  71.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 14
+|   |   |   |   |   |   |   |--- edad >  82.5
+|   |   |   |   |   |   |   |   |--- dxp_falla_respiratoria <= 0.5
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 77.5
+|   |   |   |   |   |   |   |   |   |   |--- dxp_valvulopatia <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 7
+|   |   |   |   |   |   |   |   |   |   |--- dxp_valvulopatia >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial >  77.5
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 12
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 17
+|   |   |   |   |   |   |   |   |--- dxp_falla_respiratoria >  0.5
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 7.5
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_OTRA <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 5.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_OTRA >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  7.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |--- dxp_sepsis >  0.5
+|   |   |   |   |   |   |   |--- barthel_inicial <= 55.0
+|   |   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA <= 0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 4.0] class: 1
+|   |   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA >  0.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 73.0
+|   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- edad >  73.0
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |--- barthel_inicial >  55.0
+|   |   |   |   |   |   |   |   |--- aseguradora_OTRA <= 0.5
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 77.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [5.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial >  77.5
+|   |   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 87.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 3.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- barthel_inicial >  87.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 9
+|   |   |   |   |   |   |   |   |--- aseguradora_OTRA >  0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 3.0] class: 1
+|   |   |   |   |   |--- dxp_acv >  0.5
+|   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 4.5
+|   |   |   |   |   |   |   |--- edad <= 57.5
+|   |   |   |   |   |   |   |   |--- aseguradora_OTRA <= 0.5
+|   |   |   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 55.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 11
+|   |   |   |   |   |   |   |   |   |   |--- edad >  55.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [7.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- aseguradora_OTRA >  0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 3.0] class: 1
+|   |   |   |   |   |   |   |--- edad >  57.5
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 1.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 70.5
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_EPS SURAMERICANA S A <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 5
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_EPS SURAMERICANA S A >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 5
+|   |   |   |   |   |   |   |   |   |--- edad >  70.5
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 5
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  1.5
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 45.0
+|   |   |   |   |   |   |   |   |   |   |--- weights: [6.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial >  45.0
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 59.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [5.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- edad >  59.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 8
+|   |   |   |   |   |   |--- puntuacion_sofa_inicial >  4.5
+|   |   |   |   |   |   |   |--- edad <= 33.0
+|   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- edad >  33.0
+|   |   |   |   |   |   |   |   |--- edad <= 71.0
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 5.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 9.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  5.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 62.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- edad >  62.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 5.0] class: 1
+|   |   |   |   |   |   |   |   |--- edad >  71.0
+|   |   |   |   |   |   |   |   |   |--- edad <= 84.5
+|   |   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 5.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 7
+|   |   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  5.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- edad >  84.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 5.0] class: 1
+|   |   |   |   |--- dxp_neumonia >  0.5
+|   |   |   |   |   |--- aseguradora_EPS SURAMERICANA S A <= 0.5
+|   |   |   |   |   |   |--- edad <= 46.5
+|   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |--- edad >  46.5
+|   |   |   |   |   |   |   |--- aseguradora_COOSALUD ENTIDAD PROMOTORA DE SALUD SA <= 0.5
+|   |   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA <= 0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 9.0] class: 1
+|   |   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA >  0.5
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 6.0
+|   |   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 77.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 3
+|   |   |   |   |   |   |   |   |   |   |--- barthel_inicial >  77.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 5
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  6.0
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 4.0] class: 1
+|   |   |   |   |   |   |   |--- aseguradora_COOSALUD ENTIDAD PROMOTORA DE SALUD SA >  0.5
+|   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |--- aseguradora_EPS SURAMERICANA S A >  0.5
+|   |   |   |   |   |   |--- edad <= 73.5
+|   |   |   |   |   |   |   |--- edad <= 47.5
+|   |   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- edad >  47.5
+|   |   |   |   |   |   |   |   |--- edad <= 70.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 3.0] class: 1
+|   |   |   |   |   |   |   |   |--- edad >  70.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 72.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- edad >  72.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |--- edad >  73.5
+|   |   |   |   |   |   |   |--- weights: [7.0, 0.0] class: 0
+|   |   |   |--- aseguradora_ANGIOGRAFIA DE OCCIDENTE SA >  0.5
+|   |   |   |   |--- procedencia_piso <= 0.5
+|   |   |   |   |   |--- dxp_iam <= 0.5
+|   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 1.5
+|   |   |   |   |   |   |   |--- dxp_hta <= 0.5
+|   |   |   |   |   |   |   |   |--- edad <= 49.0
+|   |   |   |   |   |   |   |   |   |--- dxp_cardiopatia_isquemica_cronica <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 6.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- dxp_cardiopatia_isquemica_cronica >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 41.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- edad >  41.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 3.0] class: 1
+|   |   |   |   |   |   |   |   |--- edad >  49.0
+|   |   |   |   |   |   |   |   |   |--- dxp_valvulopatia <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 78.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 15
+|   |   |   |   |   |   |   |   |   |   |--- edad >  78.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 14
+|   |   |   |   |   |   |   |   |   |--- dxp_valvulopatia >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- dxp_hta >  0.5
+|   |   |   |   |   |   |   |   |--- edad <= 54.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |--- edad >  54.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 81.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 62.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [4.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- edad >  62.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 6
+|   |   |   |   |   |   |   |   |   |--- edad >  81.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [5.0, 0.0] class: 0
+|   |   |   |   |   |   |--- puntuacion_sofa_inicial >  1.5
+|   |   |   |   |   |   |   |--- barthel_inicial <= 67.5
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |--- barthel_inicial >  67.5
+|   |   |   |   |   |   |   |   |--- edad <= 66.5
+|   |   |   |   |   |   |   |   |   |--- dxp_falla_cardiaca <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- dxp_valvulopatia <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 8
+|   |   |   |   |   |   |   |   |   |   |--- dxp_valvulopatia >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- dxp_falla_cardiaca >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- edad >  66.5
+|   |   |   |   |   |   |   |   |   |--- capitulo_dx_I <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [6.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- capitulo_dx_I >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 69.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |   |--- edad >  69.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 13
+|   |   |   |   |   |--- dxp_iam >  0.5
+|   |   |   |   |   |   |--- edad <= 80.5
+|   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 6.0
+|   |   |   |   |   |   |   |   |--- edad <= 69.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 60.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [12.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- edad >  60.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 61.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |   |--- edad >  61.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 4
+|   |   |   |   |   |   |   |   |--- edad >  69.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 76.5
+|   |   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 1.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 7
+|   |   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  1.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 4
+|   |   |   |   |   |   |   |   |   |--- edad >  76.5
+|   |   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [9.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  6.0
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |--- edad >  80.5
+|   |   |   |   |   |   |   |--- barthel_inicial <= 92.5
+|   |   |   |   |   |   |   |   |--- barthel_inicial <= 85.0
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 3.0] class: 1
+|   |   |   |   |   |   |   |   |--- barthel_inicial >  85.0
+|   |   |   |   |   |   |   |   |   |--- edad <= 88.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 1.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- edad >  88.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |--- barthel_inicial >  92.5
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 0.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 89.0
+|   |   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 97.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- barthel_inicial >  97.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |--- edad >  89.0
+|   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [5.0, 0.0] class: 0
+|   |   |   |   |--- procedencia_piso >  0.5
+|   |   |   |   |   |--- dxp_falla_cardiaca <= 0.5
+|   |   |   |   |   |   |--- edad <= 50.0
+|   |   |   |   |   |   |   |--- dxp_cardiopatia_isquemica_cronica <= 0.5
+|   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- dxp_cardiopatia_isquemica_cronica >  0.5
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |--- edad >  50.0
+|   |   |   |   |   |   |   |--- dxp_valvulopatia <= 0.5
+|   |   |   |   |   |   |   |   |--- weights: [42.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- dxp_valvulopatia >  0.5
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 5.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 74.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 72.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- edad >  72.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- edad >  74.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [15.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  5.5
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 95.0
+|   |   |   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial >  95.0
+|   |   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 7.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  7.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |--- dxp_falla_cardiaca >  0.5
+|   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 3.0
+|   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 0.5
+|   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  0.5
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |--- puntuacion_sofa_inicial >  3.0
+|   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |--- capitulo_dx_E >  0.5
+|   |   |   |--- puntuacion_sofa_inicial <= 0.5
+|   |   |   |   |--- edad <= 40.0
+|   |   |   |   |   |--- dxp_desnutricion <= 0.5
+|   |   |   |   |   |   |--- edad <= 31.0
+|   |   |   |   |   |   |   |--- edad <= 23.0
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |--- edad >  23.0
+|   |   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |--- edad >  31.0
+|   |   |   |   |   |   |   |--- edad <= 35.5
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |--- edad >  35.5
+|   |   |   |   |   |   |   |   |--- edad <= 37.0
+|   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- edad >  37.0
+|   |   |   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |--- dxp_desnutricion >  0.5
+|   |   |   |   |   |   |--- weights: [4.0, 0.0] class: 0
+|   |   |   |   |--- edad >  40.0
+|   |   |   |   |   |--- edad <= 89.0
+|   |   |   |   |   |   |--- aseguradora_EPS SURAMERICANA S A <= 0.5
+|   |   |   |   |   |   |   |--- edad <= 72.5
+|   |   |   |   |   |   |   |   |--- weights: [31.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- edad >  72.5
+|   |   |   |   |   |   |   |   |--- edad <= 73.5
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 97.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial >  97.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- edad >  73.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 78.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [7.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- edad >  78.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 80.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- edad >  80.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [4.0, 0.0] class: 0
+|   |   |   |   |   |   |--- aseguradora_EPS SURAMERICANA S A >  0.5
+|   |   |   |   |   |   |   |--- procedencia_piso <= 0.5
+|   |   |   |   |   |   |   |   |--- edad <= 54.5
+|   |   |   |   |   |   |   |   |   |--- weights: [1.0, 1.0] class: 0
+|   |   |   |   |   |   |   |   |--- edad >  54.5
+|   |   |   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- procedencia_piso >  0.5
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |--- edad >  89.0
+|   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |--- puntuacion_sofa_inicial >  0.5
+|   |   |   |   |--- edad <= 65.5
+|   |   |   |   |   |--- barthel_inicial <= 25.0
+|   |   |   |   |   |   |--- edad <= 58.0
+|   |   |   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |   |   |--- edad >  58.0
+|   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |--- barthel_inicial >  25.0
+|   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA <= 0.5
+|   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 6.5
+|   |   |   |   |   |   |   |   |--- dxp_desnutricion <= 0.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 31.5
+|   |   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 95.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- barthel_inicial >  95.0
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 3
+|   |   |   |   |   |   |   |   |   |--- edad >  31.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 61.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [29.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- edad >  61.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 5
+|   |   |   |   |   |   |   |   |--- dxp_desnutricion >  0.5
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 4.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [50.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  4.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 47.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 4
+|   |   |   |   |   |   |   |   |   |   |--- edad >  47.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [10.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  6.5
+|   |   |   |   |   |   |   |   |--- edad <= 61.0
+|   |   |   |   |   |   |   |   |   |--- aseguradora_SALUD TOTAL EPS S SA <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [11.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- aseguradora_SALUD TOTAL EPS S SA >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 97.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- barthel_inicial >  97.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- edad >  61.0
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 85.0
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial >  85.0
+|   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA >  0.5
+|   |   |   |   |   |   |   |--- edad <= 47.5
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 3.5
+|   |   |   |   |   |   |   |   |   |--- weights: [14.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  3.5
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 4.5
+|   |   |   |   |   |   |   |   |   |   |--- dxp_desnutricion <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- dxp_desnutricion >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  4.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [5.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- edad >  47.5
+|   |   |   |   |   |   |   |   |--- barthel_inicial <= 85.0
+|   |   |   |   |   |   |   |   |   |--- weights: [9.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- barthel_inicial >  85.0
+|   |   |   |   |   |   |   |   |   |--- procedencia_piso <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 57.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 6
+|   |   |   |   |   |   |   |   |   |   |--- edad >  57.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [6.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- procedencia_piso >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 58.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- edad >  58.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |--- edad >  65.5
+|   |   |   |   |   |--- barthel_inicial <= 97.5
+|   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 7.5
+|   |   |   |   |   |   |   |--- weights: [130.0, 0.0] class: 0
+|   |   |   |   |   |   |--- puntuacion_sofa_inicial >  7.5
+|   |   |   |   |   |   |   |--- barthel_inicial <= 65.0
+|   |   |   |   |   |   |   |   |--- weights: [4.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- barthel_inicial >  65.0
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |--- barthel_inicial >  97.5
+|   |   |   |   |   |   |--- aseguradora_infrequent_sklearn <= 0.5
+|   |   |   |   |   |   |   |--- edad <= 70.5
+|   |   |   |   |   |   |   |   |--- weights: [27.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- edad >  70.5
+|   |   |   |   |   |   |   |   |--- procedencia_piso <= 0.5
+|   |   |   |   |   |   |   |   |   |--- aseguradora_ANGIOGRAFIA DE OCCIDENTE SA <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 75.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 6
+|   |   |   |   |   |   |   |   |   |   |--- edad >  75.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 4
+|   |   |   |   |   |   |   |   |   |--- aseguradora_ANGIOGRAFIA DE OCCIDENTE SA >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- dxp_desnutricion <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- dxp_desnutricion >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- procedencia_piso >  0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [20.0, 0.0] class: 0
+|   |   |   |   |   |   |--- aseguradora_infrequent_sklearn >  0.5
+|   |   |   |   |   |   |   |--- dxp_diabetes <= 0.5
+|   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- dxp_diabetes >  0.5
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |--- puntuacion_sofa_inicial >  8.5
+|   |   |--- puntuacion_sofa_inicial <= 13.5
+|   |   |   |--- dxp_desnutricion <= 0.5
+|   |   |   |   |--- capitulo_dx_D <= 0.5
+|   |   |   |   |   |--- edad <= 54.5
+|   |   |   |   |   |   |--- edad <= 45.0
+|   |   |   |   |   |   |   |--- capitulo_dx_K <= 0.5
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 12.5
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 10.5
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_EPS SURAMERICANA S A <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 4.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_EPS SURAMERICANA S A >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  10.5
+|   |   |   |   |   |   |   |   |   |   |--- dxp_sepsis <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [5.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- dxp_sepsis >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  12.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 3.0] class: 1
+|   |   |   |   |   |   |   |--- capitulo_dx_K >  0.5
+|   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |--- edad >  45.0
+|   |   |   |   |   |   |   |--- aseguradora_SALUD TOTAL EPS S SA <= 0.5
+|   |   |   |   |   |   |   |   |--- dxp_falla_respiratoria <= 0.5
+|   |   |   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [10.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 51.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- edad >  51.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |--- dxp_falla_respiratoria >  0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |--- aseguradora_SALUD TOTAL EPS S SA >  0.5
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |--- edad >  54.5
+|   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 10.5
+|   |   |   |   |   |   |   |--- edad <= 58.5
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 6.0] class: 1
+|   |   |   |   |   |   |   |--- edad >  58.5
+|   |   |   |   |   |   |   |   |--- aseguradora_ANGIOGRAFIA DE OCCIDENTE SA <= 0.5
+|   |   |   |   |   |   |   |   |   |--- capitulo_dx_K <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- procedencia_piso <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 8
+|   |   |   |   |   |   |   |   |   |   |--- procedencia_piso >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 6
+|   |   |   |   |   |   |   |   |   |--- capitulo_dx_K >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 5.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- aseguradora_ANGIOGRAFIA DE OCCIDENTE SA >  0.5
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 72.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial >  72.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 69.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- edad >  69.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 7.0] class: 1
+|   |   |   |   |   |   |--- puntuacion_sofa_inicial >  10.5
+|   |   |   |   |   |   |   |--- edad <= 66.5
+|   |   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA <= 0.5
+|   |   |   |   |   |   |   |   |   |--- edad <= 63.5
+|   |   |   |   |   |   |   |   |   |   |--- capitulo_dx_F <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 5.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- capitulo_dx_F >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- edad >  63.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA >  0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [4.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- edad >  66.5
+|   |   |   |   |   |   |   |   |--- edad <= 84.5
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 47.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 6.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial >  47.5
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_EPS SURAMERICANA S A <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 7
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_EPS SURAMERICANA S A >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 4
+|   |   |   |   |   |   |   |   |--- edad >  84.5
+|   |   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |--- capitulo_dx_D >  0.5
+|   |   |   |   |   |--- weights: [9.0, 0.0] class: 0
+|   |   |   |--- dxp_desnutricion >  0.5
+|   |   |   |   |--- barthel_inicial <= 12.5
+|   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |--- barthel_inicial >  12.5
+|   |   |   |   |   |--- aseguradora_OTRA <= 0.5
+|   |   |   |   |   |   |--- barthel_inicial <= 97.5
+|   |   |   |   |   |   |   |--- weights: [13.0, 0.0] class: 0
+|   |   |   |   |   |   |--- barthel_inicial >  97.5
+|   |   |   |   |   |   |   |--- edad <= 81.0
+|   |   |   |   |   |   |   |   |--- edad <= 76.5
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 9.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 55.0
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- edad >  55.0
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  9.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [7.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- edad >  76.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |--- edad >  81.0
+|   |   |   |   |   |   |   |   |--- weights: [4.0, 0.0] class: 0
+|   |   |   |   |   |--- aseguradora_OTRA >  0.5
+|   |   |   |   |   |   |--- barthel_inicial <= 70.0
+|   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |--- barthel_inicial >  70.0
+|   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |--- puntuacion_sofa_inicial >  13.5
+|   |   |   |--- aseguradora_SALUD TOTAL EPS S SA <= 0.5
+|   |   |   |   |--- capitulo_dx_G <= 0.5
+|   |   |   |   |   |--- capitulo_dx_F <= 0.5
+|   |   |   |   |   |   |--- edad <= 61.0
+|   |   |   |   |   |   |   |--- edad <= 53.0
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 6.0] class: 1
+|   |   |   |   |   |   |   |--- edad >  53.0
+|   |   |   |   |   |   |   |   |--- edad <= 57.0
+|   |   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- edad >  57.0
+|   |   |   |   |   |   |   |   |   |--- edad <= 59.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- edad >  59.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |--- edad >  61.0
+|   |   |   |   |   |   |   |--- dxp_desnutricion <= 0.5
+|   |   |   |   |   |   |   |   |--- weights: [0.0, 29.0] class: 1
+|   |   |   |   |   |   |   |--- dxp_desnutricion >  0.5
+|   |   |   |   |   |   |   |   |--- barthel_inicial <= 92.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 3.0] class: 1
+|   |   |   |   |   |   |   |   |--- barthel_inicial >  92.5
+|   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |--- capitulo_dx_F >  0.5
+|   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |--- capitulo_dx_G >  0.5
+|   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |--- aseguradora_SALUD TOTAL EPS S SA >  0.5
+|   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|--- dxp_arritmia >  0.5
+|   |--- aseguradora_ANGIOGRAFIA DE OCCIDENTE SA <= 0.5
+|   |   |--- barthel_inicial <= 92.5
+|   |   |   |--- aseguradora_EPS SURAMERICANA S A <= 0.5
+|   |   |   |   |--- weights: [15.0, 0.0] class: 0
+|   |   |   |--- aseguradora_EPS SURAMERICANA S A >  0.5
+|   |   |   |   |--- edad <= 94.0
+|   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |--- edad >  94.0
+|   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |--- barthel_inicial >  92.5
+|   |   |   |--- edad <= 72.0
+|   |   |   |   |--- edad <= 38.0
+|   |   |   |   |   |--- weights: [4.0, 0.0] class: 0
+|   |   |   |   |--- edad >  38.0
+|   |   |   |   |   |--- edad <= 51.0
+|   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 4.0
+|   |   |   |   |   |   |   |--- weights: [0.0, 15.0] class: 1
+|   |   |   |   |   |   |--- puntuacion_sofa_inicial >  4.0
+|   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |--- edad >  51.0
+|   |   |   |   |   |   |--- procedencia_piso <= 0.5
+|   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 1.5
+|   |   |   |   |   |   |   |   |--- barthel_inicial <= 97.5
+|   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |--- barthel_inicial >  97.5
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 11.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_OTRA <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 6
+|   |   |   |   |   |   |   |   |   |   |--- aseguradora_OTRA >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  1.5
+|   |   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS <= 0.5
+|   |   |   |   |   |   |   |   |   |--- aseguradora_SALUD TOTAL EPS S SA <= 0.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [4.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- aseguradora_SALUD TOTAL EPS S SA >  0.5
+|   |   |   |   |   |   |   |   |   |   |--- edad <= 67.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |   |   |   |   |--- edad >  67.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS >  0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |   |   |   |   |   |--- procedencia_piso >  0.5
+|   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |--- edad >  72.0
+|   |   |   |   |--- edad <= 75.5
+|   |   |   |   |   |--- weights: [6.0, 0.0] class: 0
+|   |   |   |   |--- edad >  75.5
+|   |   |   |   |   |--- edad <= 81.5
+|   |   |   |   |   |   |--- edad <= 79.0
+|   |   |   |   |   |   |   |--- edad <= 77.5
+|   |   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA <= 0.5
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |--- aseguradora_NUEVA EMPRESA PROMOTORA DE SALUD SA >  0.5
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial <= 97.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |--- barthel_inicial >  97.5
+|   |   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  0.5
+|   |   |   |   |   |   |   |   |   |   |   |--- truncated branch of depth 2
+|   |   |   |   |   |   |   |--- edad >  77.5
+|   |   |   |   |   |   |   |   |--- weights: [2.0, 0.0] class: 0
+|   |   |   |   |   |   |--- edad >  79.0
+|   |   |   |   |   |   |   |--- weights: [0.0, 4.0] class: 1
+|   |   |   |   |   |--- edad >  81.5
+|   |   |   |   |   |   |--- edad <= 90.5
+|   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS <= 0.5
+|   |   |   |   |   |   |   |   |--- weights: [10.0, 0.0] class: 0
+|   |   |   |   |   |   |   |--- aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS >  0.5
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial <= 1.0
+|   |   |   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |   |   |--- puntuacion_sofa_inicial >  1.0
+|   |   |   |   |   |   |   |   |   |--- edad <= 83.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 1.0] class: 0
+|   |   |   |   |   |   |   |   |   |--- edad >  83.5
+|   |   |   |   |   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |   |--- edad >  90.5
+|   |   |   |   |   |   |   |--- weights: [0.0, 2.0] class: 1
+|   |--- aseguradora_ANGIOGRAFIA DE OCCIDENTE SA >  0.5
+|   |   |--- edad <= 72.5
+|   |   |   |--- edad <= 63.5
+|   |   |   |   |--- edad <= 34.5
+|   |   |   |   |   |--- edad <= 33.0
+|   |   |   |   |   |   |--- weights: [0.0, 5.0] class: 1
+|   |   |   |   |   |--- edad >  33.0
+|   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |--- edad >  34.5
+|   |   |   |   |   |--- weights: [0.0, 32.0] class: 1
+|   |   |   |--- edad >  63.5
+|   |   |   |   |--- edad <= 66.5
+|   |   |   |   |   |--- puntuacion_sofa_inicial <= 0.5
+|   |   |   |   |   |   |--- edad <= 65.5
+|   |   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |   |   |   |--- edad >  65.5
+|   |   |   |   |   |   |   |--- weights: [1.0, 1.0] class: 0
+|   |   |   |   |   |--- puntuacion_sofa_inicial >  0.5
+|   |   |   |   |   |   |--- weights: [1.0, 1.0] class: 0
+|   |   |   |   |--- edad >  66.5
+|   |   |   |   |   |--- weights: [0.0, 7.0] class: 1
+|   |   |--- edad >  72.5
+|   |   |   |--- puntuacion_sofa_inicial <= 1.5
+|   |   |   |   |--- edad <= 82.5
+|   |   |   |   |   |--- weights: [3.0, 0.0] class: 0
+|   |   |   |   |--- edad >  82.5
+|   |   |   |   |   |--- barthel_inicial <= 95.0
+|   |   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+|   |   |   |   |   |--- barthel_inicial >  95.0
+|   |   |   |   |   |   |--- weights: [0.0, 1.0] class: 1
+|   |   |   |--- puntuacion_sofa_inicial >  1.5
+|   |   |   |   |--- edad <= 88.5
+|   |   |   |   |   |--- edad <= 73.5
+|   |   |   |   |   |   |--- weights: [1.0, 2.0] class: 1
+|   |   |   |   |   |--- edad >  73.5
+|   |   |   |   |   |   |--- weights: [0.0, 4.0] class: 1
+|   |   |   |   |--- edad >  88.5
+|   |   |   |   |   |--- weights: [1.0, 0.0] class: 0
+
+
+====================================================================================================
+COMPARACIÓN FINAL EN PRUEBA (ingresos feb-ago 2026)
+====================================================================================================
+
+### Estancia en UCI > 7 días
+         familia                               modelo   AUC        IC95  Brier
+Machine learning          Gradient boosting (sklearn) 0.685 0.655-0.715  0.212
+Machine learning                        Random forest 0.682 0.651-0.712  0.212
+Machine learning                              XGBoost 0.681 0.652-0.711  0.215
+         Clásico                  Logística + splines 0.681 0.650-0.711  0.213
+Machine learning                             LightGBM 0.681 0.649-0.710  0.216
+         Clásico                    Logística clásica 0.674 0.643-0.704  0.215
+         Clásico                    Árbol de decisión 0.648 0.615-0.682  0.219
+Machine learning                   Red neuronal (MLP) 0.645 0.614-0.676  0.222
+   Supervivencia    Cox (P de seguir en UCI al día 7) 0.641 0.606-0.673  0.219
+     Multiestado Markov tiempo continuo + covariables 0.637 0.603-0.670  0.220
+         Clásico  Árbol interpretable (profundidad 3) 0.580 0.552-0.609  0.374
+
+### Salida de la clínica directamente desde UCI (condición de egreso desconocida)
+         familia                                    modelo   AUC        IC95  Brier
+Machine learning                             Random forest 0.740 0.707-0.772  0.170
+Machine learning                                   XGBoost 0.736 0.701-0.768  0.168
+Machine learning               Gradient boosting (sklearn) 0.734 0.701-0.766  0.168
+         Clásico                       Logística + splines 0.734 0.703-0.767  0.170
+         Clásico                         Logística clásica 0.730 0.697-0.763  0.171
+Machine learning                                  LightGBM 0.726 0.693-0.759  0.169
+Machine learning                        Red neuronal (MLP) 0.725 0.690-0.761  0.173
+     Multiestado      Markov tiempo continuo + covariables 0.709 0.678-0.742  0.177
+         Clásico                         Árbol de decisión 0.693 0.659-0.727  0.177
+         Clásico       Árbol interpretable (profundidad 3) 0.590 0.563-0.624  0.316
+     Multiestado Markov sin covariables (solo procedencia) 0.541 0.515-0.569  0.203

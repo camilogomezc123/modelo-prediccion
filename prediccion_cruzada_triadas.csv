@@ -1,0 +1,31 @@
+﻿triada;dirección;poder;detalle;modelo
+sofa_ini / barthel_ini / uci_>7d;barthel_ini + uci_>7d -> sofa_ini;9,9;R²;Lineal (Ridge)
+sofa_ini / barthel_ini / uci_>7d;sofa_ini + uci_>7d -> barthel_ini;4,9;R²;GradientBoosting
+sofa_ini / barthel_ini / uci_>7d;sofa_ini + barthel_ini -> uci_>7d;31,3;AUC=0.656;GradientBoosting
+sofa_ini / cap_dx / egreso_uci;cap_dx + egreso_uci -> sofa_ini;15,1;R²;GradientBoosting
+sofa_ini / cap_dx / egreso_uci;sofa_ini + egreso_uci -> cap_dx;25,8;AUC=0.629;Logística
+sofa_ini / cap_dx / egreso_uci;sofa_ini + cap_dx -> egreso_uci;37,0;AUC=0.685;GradientBoosting
+edad / barthel_ini / sofa_ini;barthel_ini + sofa_ini -> edad;5,3;R²;GradientBoosting
+edad / barthel_ini / sofa_ini;edad + sofa_ini -> barthel_ini;6,3;R²;Lineal (Ridge)
+edad / barthel_ini / sofa_ini;edad + barthel_ini -> sofa_ini;5,8;R²;Lineal (Ridge)
+aseguradora / cap_dx / egreso_uci;cap_dx + egreso_uci -> aseguradora;22,8;AUC=0.614;Logística
+aseguradora / cap_dx / egreso_uci;aseguradora + egreso_uci -> cap_dx;33,6;AUC=0.668;Logística
+aseguradora / cap_dx / egreso_uci;aseguradora + cap_dx -> egreso_uci;37,8;AUC=0.689;Logística
+sofa_ini / news_ini / uci_>7d;news_ini + uci_>7d -> sofa_ini;23,4;R²;GradientBoosting
+sofa_ini / news_ini / uci_>7d;sofa_ini + uci_>7d -> news_ini;34,8;R²;GradientBoosting
+sofa_ini / news_ini / uci_>7d;sofa_ini + news_ini -> uci_>7d;34,1;AUC=0.671;GradientBoosting
+dias_uci / proced_piso / egreso_uci;proced_piso + egreso_uci -> dias_uci;7,1;R²;GradientBoosting
+dias_uci / proced_piso / egreso_uci;dias_uci + egreso_uci -> proced_piso;18,1;AUC=0.591;GradientBoosting
+dias_uci / proced_piso / egreso_uci;dias_uci + proced_piso -> egreso_uci;37,5;AUC=0.688;GradientBoosting
+sofa_ini / sofa_fin / egreso_uci;sofa_fin + egreso_uci -> sofa_ini;78,3;R²;Lineal (Ridge)
+sofa_ini / sofa_fin / egreso_uci;sofa_ini + egreso_uci -> sofa_fin;78,5;R²;GradientBoosting
+sofa_ini / sofa_fin / egreso_uci;sofa_ini + sofa_fin -> egreso_uci;21,6;AUC=0.608;GradientBoosting
+barthel_ini / barthel_fin / dias_hosp;barthel_fin + dias_hosp -> barthel_ini;43,4;R²;GradientBoosting
+barthel_ini / barthel_fin / dias_hosp;barthel_ini + dias_hosp -> barthel_fin;48,8;R²;GradientBoosting
+barthel_ini / barthel_fin / dias_hosp;barthel_ini + barthel_fin -> dias_hosp;18,0;R²;GradientBoosting
+ta_diast / sofa_fin / egreso_uci;sofa_fin + egreso_uci -> ta_diast;15,6;R²;GradientBoosting
+ta_diast / sofa_fin / egreso_uci;ta_diast + egreso_uci -> sofa_fin;14,8;R²;GradientBoosting
+ta_diast / sofa_fin / egreso_uci;ta_diast + sofa_fin -> egreso_uci;33,4;AUC=0.667;GradientBoosting
+edad / cap_dx / aseguradora;cap_dx + aseguradora -> edad;14,8;R²;GradientBoosting
+edad / cap_dx / aseguradora;edad + aseguradora -> cap_dx;33,2;AUC=0.666;Logística
+edad / cap_dx / aseguradora;edad + cap_dx -> aseguradora;24,4;AUC=0.622;Logística

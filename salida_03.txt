@@ -1,0 +1,253 @@
+==========================================================================================
+1. ASOCIACIÓN ENTRE PREDICTORES
+==========================================================================================
+(num-num: Spearman; cat-cat: V de Cramér; cat-num: eta. |valor| > 0,5 = fuerte)
+             edad  proced_piso  sofa  barthel  news  asegur  cap_dx
+edad         1.00         0.07  0.08    -0.26  0.11    0.26    0.41
+proced_piso  0.07         1.00  0.04     0.08  0.06    0.13    0.33
+sofa         0.08         0.04  1.00    -0.26  0.54    0.17    0.36
+barthel     -0.26         0.08 -0.26     1.00 -0.28    0.17    0.27
+news         0.11         0.06  0.54    -0.28  1.00    0.21    0.33
+asegur       0.26         0.13  0.17     0.17  0.21    1.00    0.21
+cap_dx       0.41         0.33  0.36     0.27  0.33    0.21    1.00
+
+==========================================================================================
+2. COLINEALIDAD (VIF; > 5 preocupante)
+==========================================================================================
+aseguradora_EPS SURAMERICANA S A                      1.57
+aseguradora_ANGIOGRAFIA DE OCCIDENTE SA               1.35
+capitulo_dx_O                                         1.33
+aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS    1.32
+capitulo_dx_E                                         1.31
+edad                                                  1.27
+capitulo_dx_C                                         1.19
+capitulo_dx_J                                         1.16
+barthel_inicial                                       1.15
+capitulo_dx_A                                         1.15
+
+==========================================================================================
+3. CRUCES ENTRE VARIABLES
+==========================================================================================
+
+-- SOFA inicial (mediana) y Barthel inicial (mediana) por capítulo diagnóstico --
+           n  sofa  barthel  edad  pct_desde_piso
+cap_dx                                           
+C        424   3.0     90.0  67.0            0.40
+D        252   3.0    100.0  61.0            0.29
+E       1036   3.0    100.0  67.0            0.22
+I       2981   1.0    100.0  70.0            0.14
+J        346   4.0     95.0  71.0            0.27
+K        286   3.0    100.0  67.0            0.32
+otros   1399   2.0    100.0  56.0            0.31
+
+-- Mezcla diagnóstica por aseguradora (% de sus ingresos) --
+cap_dx                     C    D     E     I    J    K  otros
+asegur                                                        
+ANGIOGRAFIA DE OCCIDEN   0.0  0.0   5.0  91.0  0.0  0.0    3.0
+ENTIDAD PROMOTORA DE S   7.0  7.0  20.0  31.0  7.0  7.0   21.0
+EPS SURAMERICANA S A     5.0  4.0  18.0  21.0  7.0  7.0   38.0
+NUEVA EMPRESA PROMOTOR   8.0  3.0  16.0  53.0  5.0  2.0   13.0
+OTRA                    13.0  5.0  12.0  32.0  6.0  4.0   28.0
+SALUD TOTAL EPS S SA     6.0  5.0  21.0  39.0  3.0  5.0   21.0
+
+-- Gravedad por aseguradora --
+                           n  sofa  barthel   edad  pct_desde_piso
+asegur                                                            
+ANGIOGRAFIA DE OCCIDEN   953  1.79    97.28  68.25            0.13
+ENTIDAD PROMOTORA DE S  1015  3.32    85.95  60.94            0.25
+EPS SURAMERICANA S A    1819  3.40    87.64  58.09            0.29
+NUEVA EMPRESA PROMOTOR  2117  2.91    87.70  68.29            0.19
+OTRA                     451  3.87    83.78  60.32            0.27
+SALUD TOTAL EPS S SA     369  3.18    89.20  58.70            0.26
+
+-- Barthel inicial por grupo de edad (% en cada categoría) --
+barthel  <=40  45-85  90-95   100
+edad                             
+<50       3.0    9.0    4.0  83.0
+50-70     5.0   15.0    7.0  72.0
+>70       9.0   26.0   11.0  54.0
+
+-- SOFA por grupo de Barthel (% en cada categoría) --
+sofa      0-1   2-4   5-8    >8
+barthel                        
+<=40     16.0  30.0  35.0  19.0
+45-85    27.0  34.0  26.0  13.0
+90-95    41.0  29.0  22.0   8.0
+100      50.0  31.0  13.0   6.0
+
+-- Procedencia por grupo de SOFA (% desde piso) --
+sofa
+0-1    21.0
+2-4    25.0
+5-8    26.0
+>8     25.0
+
+==========================================================================================
+4. CONFUSIÓN: EFECTO DE LA ASEGURADORA ANTES Y DESPUÉS DE AJUSTAR
+==========================================================================================
+
+Estancia en UCI > 7 días (referencia: Nueva EPS)
+                                        OR crudo  OR ajustado     n
+EPS SURAMERICANA S A                        0.83         0.77  1819
+ENTIDAD PROMOTORA DE SALUD SANITAS SAS      1.16         1.03  1015
+ANGIOGRAFIA DE OCCIDENTE SA                 0.32         0.43   953
+SALUD TOTAL EPS S SA                        1.81         1.78   369
+OTRA                                        1.02         0.95   275
+COOSALUD ENTIDAD PROMOTORA DE SALUD SA      1.78         1.29   110
+COOMEVA MEDICINA PREPAGADA S.A.             0.72         0.64    34
+SOS POS SERVICIO OCCIDENTAL DE SALUD        0.64         0.45    32
+
+Egreso de la clínica directamente desde UCI (referencia: Nueva EPS)
+                                        OR crudo  OR ajustado     n
+EPS SURAMERICANA S A                        1.02         1.26  1819
+ENTIDAD PROMOTORA DE SALUD SANITAS SAS      1.02         1.20  1015
+ANGIOGRAFIA DE OCCIDENTE SA                 4.01         3.48   953
+SALUD TOTAL EPS S SA                        0.90         1.02   369
+OTRA                                        0.96         1.04   275
+COOSALUD ENTIDAD PROMOTORA DE SALUD SA      1.20         1.17   110
+COOMEVA MEDICINA PREPAGADA S.A.             1.46         1.46    34
+SOS POS SERVICIO OCCIDENTAL DE SALUD        2.09         2.35    32
+
+==========================================================================================
+5. INTERACCIONES SOBRE LOS OBJETIVOS
+==========================================================================================
+
+### Estancia en UCI > 7 días (tasa global 25%); celdas = % con el desenlace
+
+-- sofa (filas) x barthel (columnas) --
+b    <=40  45-85  90-95   100
+a                            
+0-1  27.0   24.0   22.0  17.0
+2-4  42.0   31.0   33.0  28.0
+5-8  54.0   42.0   46.0  43.0
+>8   43.0   56.0   56.0  55.0
+
+-- sofa (filas) x cap_dx (columnas) --
+b       C     D     E     I     J     K  otros
+a                                             
+0-1  19.0  13.0  26.0  17.0  41.0  26.0   15.0
+2-4  37.0  26.0  42.0  25.0  43.0  27.0   22.0
+5-8  43.0  45.0  54.0  36.0  53.0  37.0   42.0
+>8   36.0  <NA>  75.0  47.0  50.0  41.0   49.0
+
+-- edad (filas) x barthel (columnas) --
+b      <=40  45-85  90-95   100
+a                              
+<50    31.0   36.0   40.0  22.0
+50-70  54.0   34.0   36.0  23.0
+>70    32.0   30.0   28.0  23.0
+
+-- sofa (filas) x proced (columnas) --
+b    desde piso  directo UCI
+a                           
+0-1        16.0         19.0
+2-4        31.0         29.0
+5-8        37.0         46.0
+>8         43.0         55.0
+
+-- cap_dx (filas) x asegur (columnas) --
+b      ANGIOGRAFIA DE OCCIDEN  ENTIDAD PROMOTORA DE S  EPS SURAMERICANA S A  NUEVA EMPRESA PROMOTOR  OTRA  SALUD TOTAL EPS S SA
+a                                                                                                                              
+C                        <NA>                    30.0                  30.0                    30.0  25.0                  33.0
+D                        <NA>                    27.0                  10.0                    30.0  29.0                  <NA>
+E                        20.0                    35.0                  36.0                    37.0  47.0                  45.0
+I                        10.0                    22.0                  19.0                    20.0  24.0                  38.0
+J                        <NA>                    44.0                  40.0                    41.0  41.0                  <NA>
+K                        <NA>                    30.0                  24.0                    40.0  <NA>                  30.0
+otros                     9.0                    31.0                  16.0                    28.0  26.0                  38.0
+
+-- edad (filas) x sofa (columnas) --
+b       0-1   2-4   5-8    >8
+a                            
+<50    15.0  31.0  43.0  56.0
+50-70  19.0  31.0  43.0  62.0
+>70    21.0  28.0  45.0  44.0
+
+Modelo aditivo (sin interacciones) AUC = 0.717 | con todas las interacciones = 0.710
+Ganancia de AUC al permitir solo la interacción de cada par:
+                  par  ganancia_auc
+proced_piso x barthel        0.0011
+       edad x barthel        0.0001
+        sofa x cap_dx        0.0000
+     barthel x asegur       -0.0001
+     barthel x cap_dx       -0.0001
+      asegur x cap_dx       -0.0014
+        sofa x asegur       -0.0017
+       sofa x barthel       -0.0020
+ proced_piso x asegur       -0.0023
+   proced_piso x sofa       -0.0024
+        edad x asegur       -0.0025
+        edad x cap_dx       -0.0028
+   edad x proced_piso       -0.0036
+          edad x sofa       -0.0037
+ proced_piso x cap_dx       -0.0052
+
+### Egreso de la clínica directamente desde UCI (tasa global 29%); celdas = % con el desenlace
+
+-- sofa (filas) x barthel (columnas) --
+b    <=40  45-85  90-95   100
+a                            
+0-1  10.0   18.0   23.0  30.0
+2-4  18.0   16.0   15.0  21.0
+5-8  31.0   22.0   22.0  22.0
+>8   57.0   50.0   50.0  49.0
+
+-- sofa (filas) x cap_dx (columnas) --
+b       C     D     E     I     J     K  otros
+a                                             
+0-1  25.0  17.0  11.0  35.0  16.0  19.0   20.0
+2-4  18.0  24.0   4.0  28.0  23.0  16.0   15.0
+5-8  23.0  23.0   9.0  30.0  50.0  33.0   20.0
+>8   64.0  <NA>  21.0  58.0  68.0  59.0   59.0
+
+-- edad (filas) x barthel (columnas) --
+b      <=40  45-85  90-95   100
+a                              
+<50    21.0   16.0   25.0  25.0
+50-70  38.0   21.0   22.0  30.0
+>70    26.0   23.0   26.0  33.0
+
+-- sofa (filas) x proced (columnas) --
+b    desde piso  directo UCI
+a                           
+0-1        15.0         31.0
+2-4        15.0         21.0
+5-8        17.0         26.0
+>8         58.0         50.0
+
+-- cap_dx (filas) x asegur (columnas) --
+b      ANGIOGRAFIA DE OCCIDEN  ENTIDAD PROMOTORA DE S  EPS SURAMERICANA S A  NUEVA EMPRESA PROMOTOR  OTRA  SALUD TOTAL EPS S SA
+a                                                                                                                              
+C                        <NA>                    21.0                  32.0                    22.0  22.0                  19.0
+D                        <NA>                    30.0                  14.0                    12.0  19.0                  <NA>
+E                        23.0                    11.0                  13.0                     7.0   5.0                   7.0
+I                        58.0                    35.0                  38.0                    29.0  30.0                  28.0
+J                        <NA>                    34.0                  33.0                    37.0  66.0                  <NA>
+K                        <NA>                    26.0                  27.0                    26.0  <NA>                  20.0
+otros                    67.0                    22.0                  22.0                    26.0  25.0                  24.0
+
+-- edad (filas) x sofa (columnas) --
+b       0-1   2-4   5-8    >8
+a                            
+<50    25.0  17.0  20.0  39.0
+50-70  29.0  20.0  25.0  49.0
+>70    27.0  20.0  24.0  58.0
+
+Modelo aditivo (sin interacciones) AUC = 0.732 | con todas las interacciones = 0.732
+Ganancia de AUC al permitir solo la interacción de cada par:
+                  par  ganancia_auc
+       edad x barthel        0.0029
+ proced_piso x asegur        0.0021
+ proced_piso x cap_dx        0.0017
+        sofa x cap_dx        0.0004
+   proced_piso x sofa       -0.0001
+proced_piso x barthel       -0.0001
+     barthel x cap_dx       -0.0001
+   edad x proced_piso       -0.0003
+      asegur x cap_dx       -0.0006
+       sofa x barthel       -0.0008
+     barthel x asegur       -0.0010
+          edad x sofa       -0.0014
+        sofa x asegur       -0.0021
+        edad x cap_dx       -0.0036
+        edad x asegur       -0.0039

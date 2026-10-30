@@ -1,0 +1,183 @@
+Entrenamiento: 3648 ingresos (< 2026-02-01) | Prueba: 1202 ingresos
+
+==========================================================================================
+ESTANCIA EN UCI > 7 DÍAS  [uci_prolongada]  prevalencia entrenamiento 27.2%, prueba 36.1%
+==========================================================================================
+
+-- Comparación de algoritmos (CV agrupada por paciente, datos de entrenamiento) --
+                                  modelo  AUC_cv  Brier_cv
+         RandomForest hoja=10 feats=sqrt  0.6948    0.1798
+          RandomForest hoja=30 feats=0.5  0.6920    0.1799
+          RandomForest hoja=10 feats=0.5  0.6907    0.1804
+         RandomForest hoja=30 feats=sqrt  0.6905    0.1810
+ GradientBoosting lr=0.03 hojas=8 min=40  0.6902    0.1819
+ GradientBoosting lr=0.03 hojas=8 min=80  0.6879    0.1828
+ GradientBoosting lr=0.06 hojas=8 min=40  0.6878    0.1825
+                Logística+splines C=0.05  0.6869    0.1803
+ GradientBoosting lr=0.06 hojas=8 min=80  0.6865    0.1832
+                 Logística+splines C=0.3  0.6855    0.1811
+                 Logística+splines C=1.0  0.6842    0.1817
+GradientBoosting lr=0.03 hojas=16 min=40  0.6806    0.1860
+GradientBoosting lr=0.06 hojas=16 min=40  0.6806    0.1860
+GradientBoosting lr=0.06 hojas=16 min=80  0.6795    0.1865
+GradientBoosting lr=0.03 hojas=16 min=80  0.6792    0.1865
+
+-- Mejor de cada familia, calibrado, evaluado en PRUEBA (ingresos feb-ago 2026) --
+                                 modelo calibración   AUC        IC95  AUC_PR  Brier  Brier_ref  pred_media  observado  pendiente_cal
+GradientBoosting lr=0.03 hojas=8 min=40    isotonic 0.687 0.655-0.717   0.527  0.212      0.239       0.305      0.361          0.741
+               Logística+splines C=0.05     sigmoid 0.683 0.653-0.712   0.539  0.212      0.239       0.307      0.361          0.965
+        RandomForest hoja=10 feats=sqrt     sigmoid 0.683 0.651-0.713   0.543  0.212      0.239       0.308      0.361          0.921
+
+Modelo elegido (mejor AUC en CV): RandomForest hoja=10 feats=sqrt con calibración sigmoid
+
+-- Calibración por deciles de riesgo (prueba) --
+decil                  1        2        3        4        5        6        7        8        9       10
+n                121.000  120.000  120.000  120.000  120.000  120.000  120.000  120.000  120.000  121.000
+riesgo_predicho    0.105    0.151    0.178    0.212    0.261    0.308    0.368    0.427    0.481    0.592
+tasa_observada     0.083    0.225    0.300    0.242    0.300    0.450    0.433    0.425    0.500    0.653
+
+-- Puntos de corte (elegidos en entrenamiento, medidos en prueba) --
+                  umbral  sensibilidad  especificidad    VPP    VPN  % marcados
+Youden             0.275         0.689          0.576  0.478  0.766       0.520
+sensibilidad 80%   0.202         0.813          0.408  0.437  0.794       0.672
+sensibilidad 90%   0.175         0.878          0.303  0.416  0.815       0.762
+
+-- Odds ratios (logística simple, toda la cohorte; IC 95 % bootstrap) --
+                                                        OR  IC95_inf  IC95_sup significativo
+dxp_trauma                                          915.30      0.97   1301.91              
+dxp_desnutricion                                      2.60      1.74      4.52            sí
+dxp_sepsis                                            1.76      0.94      4.31              
+aseguradora_SALUD TOTAL EPS S SA                      1.75      1.38      2.28            sí
+capitulo_dx_J                                         1.66      1.08      2.51            sí
+capitulo_dx_F                                         1.54      0.73      2.80              
+capitulo_dx_L                                         1.47      0.58      3.41              
+dxp_valvulopatia                                      1.32      0.80      2.02              
+capitulo_dx_G                                         1.27      0.71      2.09              
+dxp_falla_respiratoria                                1.18      0.58      2.36              
+aseguradora_COOSALUD ENTIDAD PROMOTORA DE SALUD SA    1.17      0.76      1.90              
+capitulo_dx_B                                         1.13      0.37      2.61              
+dxp_acv                                               1.13      0.81      1.52              
+puntuacion_sofa_inicial (por 1)                       1.13      1.10      1.15            sí
+dxp_cardiopatia_isquemica_cronica                     1.08      0.80      1.52              
+dxp_neumonia                                          1.05      0.58      1.99              
+dxp_cancer                                            1.04      0.88      1.21              
+capitulo_dx_C                                         1.04      0.88      1.21              
+capitulo_dx_K                                         1.04      0.73      1.68              
+dxp_erc                                               1.01      0.50      1.92              
+aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS    0.98      0.82      1.17              
+barthel_inicial (por 10)                              0.98      0.95      1.01              
+edad (por 10)                                         0.97      0.93      1.01              
+aseguradora_OTRA                                      0.92      0.64      1.30              
+capitulo_dx_D                                         0.91      0.64      1.31              
+capitulo_dx_E                                         0.88      0.50      1.37              
+dxp_diabetes                                          0.84      0.44      1.65              
+procedencia_piso                                      0.84      0.71      0.98            sí
+dxp_iam                                               0.80      0.55      1.11              
+dxp_falla_cardiaca                                    0.77      0.48      1.17              
+dxp_hemorragia_digestiva                              0.75      0.31      1.75              
+aseguradora_EPS SURAMERICANA S A                      0.75      0.63      0.89            sí
+capitulo_dx_N                                         0.71      0.42      1.18              
+capitulo_dx_A                                         0.71      0.39      1.16              
+capitulo_dx_T                                         0.68      0.21      1.45              
+capitulo_dx_M                                         0.66      0.36      0.98            sí
+capitulo_dx_Q                                         0.62      0.22      1.25              
+aseguradora_COOMEVA MEDICINA PREPAGADA S.A.           0.59      0.17      1.48              
+aseguradora_ANGIOGRAFIA DE OCCIDENTE SA               0.58      0.46      0.76            sí
+dxp_hta                                               0.46      0.24      0.77            sí
+dxp_arritmia                                          0.42      0.26      0.64            sí
+capitulo_dx_O                                         0.38      0.22      0.57            sí
+dxp_obstetrico                                        0.38      0.22      0.57            sí
+aseguradora_SOS POS SERVICIO OCCIDENTAL DE SALUD      0.35      0.07      0.83            sí
+capitulo_dx_S                                         0.00      0.00      0.88            sí
+
+==========================================================================================
+EGRESO DE LA CLÍNICA DIRECTAMENTE DESDE UCI  [egreso_directo_uci]  prevalencia entrenamiento 25.1%, prueba 27.7%
+==========================================================================================
+
+-- Comparación de algoritmos (CV agrupada por paciente, datos de entrenamiento) --
+                                  modelo  AUC_cv  Brier_cv
+                 Logística+splines C=1.0  0.7325    0.1602
+ GradientBoosting lr=0.06 hojas=8 min=40  0.7316    0.1595
+ GradientBoosting lr=0.03 hojas=8 min=40  0.7315    0.1594
+         RandomForest hoja=10 feats=sqrt  0.7314    0.1609
+                 Logística+splines C=0.3  0.7312    0.1604
+          RandomForest hoja=10 feats=0.5  0.7274    0.1592
+                Logística+splines C=0.05  0.7254    0.1622
+         RandomForest hoja=30 feats=sqrt  0.7219    0.1650
+GradientBoosting lr=0.03 hojas=16 min=40  0.7217    0.1627
+          RandomForest hoja=30 feats=0.5  0.7209    0.1617
+GradientBoosting lr=0.06 hojas=16 min=40  0.7203    0.1631
+ GradientBoosting lr=0.03 hojas=8 min=80  0.7198    0.1619
+ GradientBoosting lr=0.06 hojas=8 min=80  0.7182    0.1623
+GradientBoosting lr=0.06 hojas=16 min=80  0.7142    0.1640
+GradientBoosting lr=0.03 hojas=16 min=80  0.7132    0.1644
+
+-- Mejor de cada familia, calibrado, evaluado en PRUEBA (ingresos feb-ago 2026) --
+                                 modelo calibración   AUC        IC95  AUC_PR  Brier  Brier_ref  pred_media  observado  pendiente_cal
+                Logística+splines C=1.0    isotonic 0.738 0.708-0.770   0.548  0.170      0.201       0.238      0.277          0.895
+        RandomForest hoja=10 feats=sqrt     sigmoid 0.737 0.704-0.769   0.562  0.168      0.201       0.239      0.277          1.055
+GradientBoosting lr=0.06 hojas=8 min=40    isotonic 0.730 0.697-0.761   0.554  0.169      0.201       0.246      0.277          0.929
+
+Modelo elegido (mejor AUC en CV): Logística+splines C=1.0 con calibración isotonic
+
+-- Calibración por deciles de riesgo (prueba) --
+decil                  1        2        3        4        5        6        7        8        9       10
+n                121.000  120.000  120.000  120.000  120.000  120.000  120.000  120.000  120.000  121.000
+riesgo_predicho    0.028    0.077    0.123    0.157    0.180    0.211    0.246    0.288    0.389    0.676
+tasa_observada     0.050    0.075    0.208    0.200    0.217    0.208    0.300    0.383    0.450    0.678
+
+-- Puntos de corte (elegidos en entrenamiento, medidos en prueba) --
+                  umbral  sensibilidad  especificidad    VPP    VPN  % marcados
+Youden             0.253         0.571          0.769  0.486  0.824       0.325
+sensibilidad 80%   0.187         0.745          0.557  0.392  0.851       0.527
+sensibilidad 90%   0.157         0.853          0.405  0.355  0.878       0.666
+
+-- Odds ratios (logística simple, toda la cohorte; IC 95 % bootstrap) --
+                                                      OR  IC95_inf  IC95_sup significativo
+dxp_neumonia                                        8.44      3.90     19.00            sí
+dxp_falla_respiratoria                              5.72      2.48     12.12            sí
+dxp_arritmia                                        3.98      3.09      5.43            sí
+dxp_sepsis                                          3.46      1.83      8.28            sí
+aseguradora_ANGIOGRAFIA DE OCCIDENTE SA             2.78      2.26      3.55            sí
+capitulo_dx_Q                                       2.61      1.34      5.49            sí
+dxp_erc                                             2.30      0.91      7.75              
+dxp_acv                                             1.76      1.38      2.32            sí
+aseguradora_SOS POS SERVICIO OCCIDENTAL DE SALUD    1.68      0.58      3.54              
+dxp_cardiopatia_isquemica_cronica                   1.54      1.18      2.03            sí
+aseguradora_EPS SURAMERICANA S A                    1.23      1.02      1.59            sí
+aseguradora_COOMEVA MEDICINA PREPAGADA S.A.         1.22      0.39      3.24              
+aseguradora_ENTIDAD PROMOTORA DE SALUD SANITAS SAS  1.17      0.95      1.44              
+dxp_hemorragia_digestiva                            1.14      0.45      2.34              
+aseguradora_OTRA                                    1.13      0.74      1.64              
+dxp_falla_cardiaca                                  1.13      0.69      1.76              
+puntuacion_sofa_inicial (por 1)                     1.11      1.09      1.14            sí
+aseguradora_SALUD TOTAL EPS S SA                    1.06      0.74      1.52              
+edad (por 10)                                       1.01      0.96      1.06              
+barthel_inicial (por 10)                            1.00      0.96      1.04              
+capitulo_dx_C                                       0.99      0.85      1.15              
+dxp_cancer                                          0.99      0.85      1.15              
+capitulo_dx_S                                       0.94      0.70      5.04              
+aseguradora_COOSALUD ENTIDAD PROMOTORA DE SALUD SA  0.94      0.56      1.59              
+capitulo_dx_L                                       0.93      0.40      2.58              
+capitulo_dx_K                                       0.83      0.52      1.18              
+dxp_obstetrico                                      0.79      0.57      1.07              
+capitulo_dx_O                                       0.79      0.57      1.07              
+capitulo_dx_G                                       0.77      0.42      1.35              
+dxp_iam                                             0.73      0.52      0.96            sí
+capitulo_dx_E                                       0.72      0.40      1.24              
+capitulo_dx_A                                       0.70      0.32      1.14              
+capitulo_dx_D                                       0.69      0.45      1.01              
+dxp_trauma                                          0.68      0.11      0.86            sí
+procedencia_piso                                    0.65      0.53      0.76            sí
+capitulo_dx_B                                       0.62      0.10      1.63              
+capitulo_dx_M                                       0.61      0.35      0.99            sí
+dxp_valvulopatia                                    0.49      0.25      0.82            sí
+capitulo_dx_T                                       0.40      0.07      0.81            sí
+dxp_diabetes                                        0.39      0.15      0.83            sí
+capitulo_dx_J                                       0.35      0.17      0.59            sí
+dxp_hta                                             0.32      0.18      0.52            sí
+capitulo_dx_N                                       0.25      0.06      0.50            sí
+dxp_desnutricion                                    0.24      0.12      0.48            sí
+capitulo_dx_F                                       0.07      0.00      0.19            sí
+
+Modelos guardados en modelos/

@@ -1,0 +1,18 @@
+Reglas para: Estancia en UCI > 7 días (tasa global 29%). Árbol de profundidad 3 entrenado con toda la cohorte.
+
+SI puntuacion_sofa_inicial <= 4.5 Y NO dxp_desnutricion Y puntuacion_sofa_inicial <= 1.5
+   -> 18% con el desenlace (n=1967) [BAJO]
+SI puntuacion_sofa_inicial <= 4.5 Y NO dxp_desnutricion Y puntuacion_sofa_inicial > 1.5
+   -> 27% con el desenlace (n=1331) [medio]
+SI puntuacion_sofa_inicial <= 4.5 Y dxp_desnutricion Y barthel_inicial <= 92.5
+   -> 36% con el desenlace (n=143) [medio]
+SI puntuacion_sofa_inicial <= 4.5 Y dxp_desnutricion Y barthel_inicial > 92.5
+   -> 48% con el desenlace (n=178) [ALTO]
+SI puntuacion_sofa_inicial > 4.5 Y NO dxp_desnutricion Y puntuacion_sofa_inicial <= 7.5
+   -> 39% con el desenlace (n=592) [medio]
+SI puntuacion_sofa_inicial > 4.5 Y NO dxp_desnutricion Y puntuacion_sofa_inicial > 7.5
+   -> 49% con el desenlace (n=416) [ALTO]
+SI puntuacion_sofa_inicial > 4.5 Y dxp_desnutricion Y puntuacion_sofa_inicial <= 8.5
+   -> 59% con el desenlace (n=158) [ALTO]
+SI puntuacion_sofa_inicial > 4.5 Y dxp_desnutricion Y puntuacion_sofa_inicial > 8.5
+   -> 78% con el desenlace (n=65) [ALTO]

@@ -1,0 +1,13 @@
+# Datos de pacientes: NO se suben (repositorio público)
+egresos uci*.xlsx
+egresos uci*.csv
+revision_altas_uci_criticas.xlsx
+
+# Modelos entrenados con datos de pacientes (se regeneran con 07_integracion.py y 08_busqueda_automatica.py)
+modelos/*.joblib
+
+# Registros pesados y temporales
+salida_08.txt
+__pycache__/
+*.pyc
+~$*
