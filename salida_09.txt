@@ -1,0 +1,3 @@
+salida_uci_2d: catboost | AUC CV 0.690 | prueba 0.698 (0.659-0.731) | Brier 0.161 | cortes {'youden': 0.27335340469180525, 'sens90': 0.17531753054265337}
+salida_uci_3d: catboost | AUC CV 0.681 | prueba 0.677 (0.647-0.706) | Brier 0.208 | cortes {'youden': 0.4498724177377027, 'sens90': 0.276720528657366}
+piso_3d: lightgbm | AUC CV 0.673 | prueba 0.675 (0.636-0.708) | Brier 0.168 | cortes {'youden': 0.2803373819163293, 'sens90': 0.1794074908140033}

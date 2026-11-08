@@ -17,6 +17,7 @@ y para proyectar la ocupación de camas de UCI y piso.
 | `06_modelos_multiestado_ml.py` | Markov multiestado, riesgos competitivos, Cox y machine learning |
 | `07_integracion.py` | Ensamble final calibrado y modelo de ocupación (semi-Markov, `ocupacion.py`) |
 | `08_busqueda_automatica.py` | Búsqueda automática (Optuna, 8 familias de algoritmos) para salida temprana de UCI |
+| `09_modelos_dia1.py` | Modelos de salida temprana de UCI con solo variables base, listos para `predecir.py` |
 | `predecir.py` | Predicción para pacientes nuevos: `python predecir.py plantilla_pacientes.xlsx` |
 
 Reglas de seguridad: los modelos se entrenan solo con datos completos y **no dan predicción individual

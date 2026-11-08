@@ -9,6 +9,9 @@ Columnas del Excel de entrada (ver plantilla_pacientes.xlsx):
   opcionales para proyectar ocupación: servicio_actual (UCI / HOSPITALIZACION), dias_en_servicio
   `diagnostico` usa el formato de la base: "I219 - DESCRIPCION | E440 - ..." (el primero es el principal).
 
+Si existen modelos/dia1_*.joblib (09_modelos_dia1.py) suma, desde el primer día de UCI, la probabilidad
+de salir de UCI en 2 y 3 días (solo planeación) y la de pasar a piso en 3 días con posibilidad ALTA/MEDIA/BAJA.
+
 Salida (Excel): hoja Predicciones (probabilidades y nivel de riesgo por paciente), hoja Ocupacion
 (camas esperadas en 1, 3 y 7 días si se dieron servicio_actual y dias_en_servicio) y hoja Notas.
 """
@@ -26,9 +29,13 @@ DIR_MODELOS = Path(__file__).parent / "modelos"
 OBLIGATORIAS = ["ingreso", "tercero", "diagnostico", "edad", "servicio_inicial",
                 "puntuacion_sofa_inicial", "barthel_inicial"]
 ETIQUETA = {"uci_prolongada": "UCI_mas_7_dias", "egreso_directo_uci": "sale_de_clinica_desde_UCI"}
+# Salida temprana de UCI desde el primer día (09_modelos_dia1.py, solo variables base)
+ETIQUETA_DIA1 = {"salida_uci_2d": "sale_de_UCI_en_2_dias", "salida_uci_3d": "sale_de_UCI_en_3_dias",
+                 "piso_3d": "pasa_a_piso_en_3_dias"}
 # Sin condición de egreso, "sale desde UCI" mezcla altas a casa con posibles fallecidos o remisiones:
 # solo sirve para planear camas de piso, no como pronóstico. No se le asigna nivel de riesgo.
-SOLO_PLANEACION = {"egreso_directo_uci"}
+# La salida de UCI en 2 o 3 días incluye esas salidas directas; solo el paso a piso es con certeza vivo.
+SOLO_PLANEACION = {"egreso_directo_uci", "salida_uci_2d", "salida_uci_3d"}
 
 
 def nivel(p, u):
@@ -64,6 +71,21 @@ def predecir(entrada):
         if obj not in SOLO_PLANEACION:
             salida[f"riesgo_{ETIQUETA[obj]}"] = riesgo
 
+    dia1 = {obj: joblib.load(DIR_MODELOS / f"dia1_{obj}.joblib")
+            for obj in ETIQUETA_DIA1 if (DIR_MODELOS / f"dia1_{obj}.joblib").exists()}
+    for obj, m in dia1.items():
+        prob = pd.Series(np.nan, index=salida.index)
+        posibilidad = pd.Series("SIN PREDICCIÓN", index=salida.index)
+        if completo.any():
+            p = m["modelo"].predict_proba(df.loc[completo, m["columnas"]])[:, 1]
+            u = m["umbrales"]
+            prob[completo] = p.round(3)
+            posibilidad[completo] = np.where(p >= u["youden"], "ALTA", np.where(p < u["sens90"], "BAJA", "MEDIA"))
+        salida[f"prob_{ETIQUETA_DIA1[obj]}"] = prob
+        if obj not in SOLO_PLANEACION:
+            salida[f"posibilidad_{ETIQUETA_DIA1[obj]}"] = posibilidad
+    modelos.update(dia1)
+
     ocup = None
     if {"servicio_actual", "dias_en_servicio"} <= set(entrada):
         servicio = entrada["servicio_actual"].astype(str).str.strip().str.upper()
@@ -92,13 +114,17 @@ def predecir(entrada):
 def notas(modelos, avisos):
     filas = [("Fecha de predicción", date.today().isoformat())]
     for obj, m in modelos.items():
-        filas += [(f"{m['objetivo']}: modelo", m["nombre_modelo"]),
+        filas += [(f"{m['objetivo']}: modelo", m.get("nombre_modelo", m.get("familia"))),
                   (f"{m['objetivo']}: AUC en prueba (feb-ago 2026)", f"{m['auc_prueba']:.3f} (IC95 {m['ic95_prueba']})"),
                   (f"{m['objetivo']}: tasa histórica", f"{m['tasa_base']:.0%}")]
         if obj in SOLO_PLANEACION:
             filas += [(f"{m['objetivo']}: uso", "SOLO planeación de camas de piso. No es pronóstico: sin condición de "
                                                 "egreso, la salida desde UCI puede ser alta a casa o fallecimiento/remisión. "
                                                 "Probabilidad alta NO significa buena evolución.")]
+        elif obj in ETIQUETA_DIA1:
+            filas += [(f"{m['objetivo']}: posibilidad ALTA", f"probabilidad >= {m['umbrales']['youden']:.2f}"),
+                      (f"{m['objetivo']}: posibilidad BAJA", f"probabilidad < {m['umbrales']['sens90']:.2f} (por debajo "
+                                                            "queda solo ~10 % de los que pasan a piso en 3 días)")]
         else:
             filas += [(f"{m['objetivo']}: riesgo ALTO", f"probabilidad >= {m['umbrales']['youden']:.2f}"),
                       (f"{m['objetivo']}: riesgo BAJO", f"probabilidad < {m['umbrales']['sens90']:.2f} (por debajo queda solo ~10 % de los casos)")]
