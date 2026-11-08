@@ -82,3 +82,21 @@
 [2026-10-30 06:22:35] [80/96] piso_3d | base+historia | red_neuronal: AUC CV 0.6718 | prueba 0.6804 (0.645-0.713) | 62 intentos
 [2026-10-30 06:25:17] [81/96] piso_3d | base+historia+dx3 | logistica: AUC CV 0.6738 | prueba 0.6843 (0.648-0.716) | 200 intentos
 [2026-10-30 06:29:45] [82/96] piso_3d | base+historia+dx3 | random_forest: AUC CV 0.6792 | prueba 0.6846 (0.649-0.716) | 21 intentos
+[2026-10-30 06:34:16] [83/96] piso_3d | base+historia+dx3 | extra_trees: AUC CV 0.6778 | prueba 0.6838 (0.647-0.716) | 21 intentos
+[2026-10-30 06:38:38] [84/96] piso_3d | base+historia+dx3 | hist_gb: AUC CV 0.6748 | prueba 0.6909 (0.657-0.723) | 34 intentos
+[2026-10-30 06:42:57] [85/96] piso_3d | base+historia+dx3 | xgboost: AUC CV 0.6783 | prueba 0.6864 (0.652-0.719) | 80 intentos
+[2026-10-30 06:46:38] [86/96] piso_3d | base+historia+dx3 | lightgbm: AUC CV 0.6786 | prueba 0.6914 (0.656-0.723) | 200 intentos
+[2026-10-30 06:51:20] [87/96] piso_3d | base+historia+dx3 | catboost: AUC CV 0.6792 | prueba 0.6861 (0.650-0.719) | 17 intentos
+[2026-10-30 06:55:36] [88/96] piso_3d | base+historia+dx3 | red_neuronal: AUC CV 0.6779 | prueba 0.6837 (0.647-0.716) | 80 intentos
+[2026-10-30 06:58:18] [89/96] piso_3d | completo | logistica: AUC CV 0.6732 | prueba 0.6840 (0.648-0.716) | 200 intentos
+[2026-10-30 07:02:50] [90/96] piso_3d | completo | random_forest: AUC CV 0.6791 | prueba 0.6814 (0.646-0.714) | 24 intentos
+[2026-10-30 07:07:18] [91/96] piso_3d | completo | extra_trees: AUC CV 0.6771 | prueba 0.6824 (0.647-0.712) | 21 intentos
+[2026-10-30 07:11:44] [92/96] piso_3d | completo | hist_gb: AUC CV 0.6771 | prueba 0.6785 (0.645-0.710) | 40 intentos
+[2026-10-30 07:16:03] [93/96] piso_3d | completo | xgboost: AUC CV 0.6793 | prueba 0.6816 (0.646-0.713) | 41 intentos
+[2026-10-30 07:20:15] [94/96] piso_3d | completo | lightgbm: AUC CV 0.6801 | prueba 0.6796 (0.646-0.712) | 144 intentos
+[2026-10-30 07:25:01] [95/96] piso_3d | completo | catboost: AUC CV 0.6770 | prueba 0.6786 (0.645-0.712) | 15 intentos
+[2026-10-30 07:28:23] [96/96] piso_3d | completo | red_neuronal: AUC CV 0.6721 | prueba 0.6694 (0.632-0.704) | 51 intentos
+[2026-10-30 07:28:32] salida_uci_2d: elegido catboost (base) AUC CV 0.6933, prueba 0.7008
+[2026-10-30 07:29:15] salida_uci_3d: elegido catboost (base+historia+dx3) AUC CV 0.6862, prueba 0.6787
+[2026-10-30 07:30:09] piso_3d: elegido ensamble_promedio (completo) AUC CV 0.6810, prueba 0.6831
+[2026-10-30 07:30:49] === Fin de la búsqueda automática ===

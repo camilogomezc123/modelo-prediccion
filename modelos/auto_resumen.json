@@ -1,0 +1,26 @@
+{
+  "salida_uci_2d": {
+    "familia": "catboost",
+    "conjunto": "base",
+    "auc_cv": 0.693297619749882,
+    "auc_prueba": 0.7008318209316395,
+    "ic95_prueba": "0.663-0.735",
+    "brier_prueba": 0.16094981591196314
+  },
+  "salida_uci_3d": {
+    "familia": "catboost",
+    "conjunto": "base+historia+dx3",
+    "auc_cv": 0.6862022289456929,
+    "auc_prueba": 0.6786631192881194,
+    "ic95_prueba": "0.646-0.709",
+    "brier_prueba": 0.20780838903888432
+  },
+  "piso_3d": {
+    "familia": "ensamble_promedio",
+    "conjunto": "completo",
+    "auc_cv": 0.6810217747050236,
+    "auc_prueba": 0.683149584228721,
+    "ic95_prueba": "0.649-0.714",
+    "brier_prueba": 0.1702952162318871
+  }
+}
