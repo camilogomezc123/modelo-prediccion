@@ -26,3 +26,23 @@ Evidencia científica y variables recomendadas para capturar el día 1: `evidenc
 y `ficha_captura_dia1_uci.xlsx`.
 
 Entorno: Python 3.12; ejecutar con `python -X utf8`.
+
+## Módulo `uci_control` (integrado desde UCI-IA, rama `claude/uci-control-ai`)
+
+| Pieza | Archivo | Documentación |
+|---|---|---|
+| Destino y estancia al ingreso | `uci_control/prediccion/trayectoria.py` | `docs/MODELO_TRAYECTORIA.md` |
+| Egreso diario y ocupación a 7 días | `uci_control/prediccion/ocupacion.py` | `docs/EGRESO_DIARIO.md` |
+| Criterios de alta, barreras, plan de camas y aprendizaje del estado diario | `uci_control/camas/` | `docs/GESTION_CAMAS.md` |
+
+Se trajo el paquete completo porque estos módulos dependen de `conectores`, `config`, `modelos`,
+`diario` y `prediccion.riesgo`. `datos_prueba/` genera datos **sintéticos** para las pruebas.
+
+```bash
+pip install pandas openpyxl scikit-learn pytest
+python -m pytest tests/test_trayectoria.py tests/test_ocupacion.py tests/test_aprendizaje.py
+python -m uci_control modelo-trayectoria --egresos "egresos uci 2024-2026.xlsx" --salida modelos/
+python -m uci_control modelo-ocupacion --egresos "egresos uci 2024-2026.xlsx" --camas-totales 66 --salida modelos/
+```
+
+No se versionan modelos (`*.joblib`), bases del historial (`*.sqlite`) ni el Excel de egresos.

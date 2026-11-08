@@ -1,13 +1,26 @@
 # Datos de pacientes: NO se suben (repositorio público)
-egresos uci*.xlsx
-egresos uci*.csv
+egresos*.xlsx
+egresos*.csv
 revision_altas_uci_criticas.xlsx
+datos_reales/
+*.sqlite
 
-# Modelos entrenados con datos de pacientes (se regeneran con 07_integracion.py y 08_busqueda_automatica.py)
-modelos/*.joblib
+# Modelos entrenados con datos de pacientes (se regeneran con los scripts)
+*.joblib
+
+# Credenciales del conector de correo
+.env
+credentials*.json
+token*.json
+client_secret*.json
+*.eml
+!datos_prueba/**/*.eml
 
 # Registros pesados y temporales
 salida_08.txt
+salida/
+catboost_info/
+.pytest_cache/
 __pycache__/
 *.pyc
 ~$*
