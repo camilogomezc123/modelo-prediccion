@@ -6,6 +6,19 @@ y para proyectar la ocupación de camas de UCI y piso.
 > Los datos de pacientes **no** están en este repositorio. Para correr los scripts, coloque
 > `egresos uci 2024-2026.xlsx` (hoja "Consolidado por ingreso") en esta carpeta.
 
+## Uso diario: una sola página con todos los modelos
+
+Con XAMPP encendido: **http://localhost/Modelo%20de%20prediccion/** (solo abre desde este equipo, ver `.htaccess`).
+Se llenan los datos del paciente al ingreso a UCI y la página muestra, en una sola consulta:
+
+- Salida temprana desde el día 1 (`09_modelos_dia1.py`): paso a piso en 3 días con posibilidad ALTA/MEDIA/BAJA y salida de UCI en 2 y 3 días (solo planeación).
+- UCI más de 7 días con dos estimaciones (ensamble del proyecto y UCI-IA), días esperados y probabilidad por rango.
+- Camino de salida (UCI-IA y proyecto), salida de UCI día a día los próximos 14 días y ocupación semi-Markov a 1, 3 y 7 días.
+
+`index.php` llama a `prediccion_unificada.py`, que deja un proceso local (127.0.0.1:8765) con los modelos en memoria:
+la primera consulta tarda unos 12 s y las siguientes unos 2 s. `index.php#demo` carga un paciente ficticio de ejemplo.
+Sin edad, SOFA o Barthel no se da ninguna predicción.
+
 ## Flujo
 
 | Script | Qué hace |

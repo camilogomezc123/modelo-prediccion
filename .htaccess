@@ -1,0 +1,8 @@
+# Solo este equipo puede abrir la carpeta (la red no)
+Require local
+Options -Indexes
+
+# Datos de pacientes, modelos y bases: nunca por web, ni desde este equipo
+<FilesMatch "\.(xlsx|xls|csv|joblib|sqlite|txt|json|py|md|eml)$">
+    Require all denied
+</FilesMatch>
